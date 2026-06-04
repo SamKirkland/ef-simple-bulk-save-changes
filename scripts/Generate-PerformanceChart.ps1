@@ -61,12 +61,12 @@ $scenario = $null
 $inPerformanceSection = $false
 
 foreach ($line in Get-Content -LiteralPath $ReadmePath) {
-    if ($line -eq "## Performance Results" -or $line -eq "## SQLite Performance Results" -or $line -eq "## SQLite and PostgreSQL Performance Results") {
+    if ($line -eq "## Performance Results" -or $line -eq "## SQLite Performance Results" -or $line -eq "## SQLite and PostgreSQL Performance Results" -or $line -eq "## SQLite, PostgreSQL, and CockroachDB Performance Results") {
         $inPerformanceSection = $true
         continue
     }
 
-    if ($inPerformanceSection -and $line.StartsWith("## ") -and $line -ne "## Performance Results" -and $line -ne "## SQLite Performance Results" -and $line -ne "## SQLite and PostgreSQL Performance Results") {
+    if ($inPerformanceSection -and $line.StartsWith("## ") -and $line -ne "## Performance Results" -and $line -ne "## SQLite Performance Results" -and $line -ne "## SQLite and PostgreSQL Performance Results" -and $line -ne "## SQLite, PostgreSQL, and CockroachDB Performance Results") {
         break
     }
 
@@ -84,7 +84,7 @@ foreach ($line in Get-Content -LiteralPath $ReadmePath) {
     }
 
     $cells = $line.Trim("|").Split("|") | ForEach-Object { $_.Trim() }
-    if ($cells.Count -ne 5 -and $cells.Count -ne 7) {
+    if ($cells.Count -ne 5 -and $cells.Count -ne 7 -and $cells.Count -ne 9) {
         continue
     }
 
@@ -97,6 +97,9 @@ foreach ($line in Get-Content -LiteralPath $ReadmePath) {
 
     Add-PerformanceRow $rows $scenario $cells[0] $method $batchSize "SQLite" (Parse-Number $cells[3]) (Parse-Number $cells[4].TrimEnd("x"))
     Add-PerformanceRow $rows $scenario $cells[0] $method $batchSize "PostgreSQL" (Parse-Number $cells[5]) (Parse-Number $cells[6].TrimEnd("x"))
+    if ($cells.Count -eq 9) {
+        Add-PerformanceRow $rows $scenario $cells[0] $method $batchSize "CockroachDB" (Parse-Number $cells[7]) (Parse-Number $cells[8].TrimEnd("x"))
+    }
 }
 
 if ($rows.Count -eq 0) {
@@ -152,8 +155,10 @@ $svg = New-Object System.Text.StringBuilder
 [void]$svg.AppendLine("  <text x=""44"" y=""80"" class=""legend"">SQLite</text>")
 [void]$svg.AppendLine("  <rect x=""104"" y=""70"" width=""12"" height=""12"" rx=""2"" fill=""#2f855a""/>")
 [void]$svg.AppendLine("  <text x=""124"" y=""80"" class=""legend"">PostgreSQL</text>")
-[void]$svg.AppendLine("  <rect x=""218"" y=""70"" width=""12"" height=""12"" rx=""2"" fill=""#d65f5f""/>")
-[void]$svg.AppendLine("  <text x=""238"" y=""80"" class=""legend"">slower than SaveChanges</text>")
+[void]$svg.AppendLine("  <rect x=""214"" y=""70"" width=""12"" height=""12"" rx=""2"" fill=""#7c3aed""/>")
+[void]$svg.AppendLine("  <text x=""234"" y=""80"" class=""legend"">CockroachDB</text>")
+[void]$svg.AppendLine("  <rect x=""336"" y=""70"" width=""12"" height=""12"" rx=""2"" fill=""#d65f5f""/>")
+[void]$svg.AppendLine("  <text x=""356"" y=""80"" class=""legend"">slower than SaveChanges</text>")
 
 for ($tick = 0; $tick -le $maxSpeedup; $tick++) {
     $x = $left + (($tick / $maxSpeedup) * $axisWidth)
@@ -188,6 +193,9 @@ foreach ($group in $groupedRows) {
                 }
                 elseif ($row.Database -eq "PostgreSQL") {
                     "#2f855a"
+                }
+                elseif ($row.Database -eq "CockroachDB") {
+                    "#7c3aed"
                 }
                 else {
                     "#2374ab"
