@@ -168,9 +168,10 @@ public static class BulkSynchronizeExtensions
                 mapping,
                 scopeValues.ToDictionary(pair => pair.Key, pair => (IReadOnlyCollection<object?>)pair.Value));
 
+        var existingRows = await query.ToListAsync(cancellationToken).ConfigureAwait(false);
         var deleteBatch = new List<TEntity>(options.BatchSize);
         var savedCount = 0;
-        await foreach (var existing in query.AsAsyncEnumerable().WithCancellation(cancellationToken).ConfigureAwait(false))
+        foreach (var existing in existingRows)
         {
             var keyValue = mapping.GetKeyValue(existing);
             if (keyValue is not null && sourceKeys.Contains(keyValue))

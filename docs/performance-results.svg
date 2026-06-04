@@ -1,4 +1,4 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" width="960" height="2220" viewBox="0 0 960 2220" role="img" aria-labelledby="title desc">
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="3888" viewBox="0 0 1080 3888" role="img" aria-labelledby="title desc">
   <title id="title">BulkSaveChanges performance results</title>
   <desc id="desc">Horizontal bar chart showing speedup versus SaveChanges for save and synchronize scenarios.</desc>
   <rect width="100%" height="100%" fill="#ffffff"/>
@@ -8,192 +8,365 @@
     .subtitle { font-size: 13px; fill: #566174; }
     .scenario { font-size: 15px; font-weight: 700; }
     .row-count { font-size: 13px; font-weight: 700; fill: #394255; }
-    .method { font-size: 12px; fill: #566174; }
+    .method-heading { font-size: 12px; font-weight: 700; fill: #394255; }
+    .database { font-size: 11px; fill: #697386; }
     .subsection-rule { stroke: #e2e8f0; stroke-width: 1; }
     .axis { stroke: #c9d1dd; stroke-width: 1; }
     .grid { stroke: #edf1f6; stroke-width: 1; }
     .tick { font-size: 11px; fill: #697386; }
     .value { font-size: 12px; font-weight: 600; }
+    .value-inside { font-size: 12px; font-weight: 600; fill: #ffffff; }
+    .legend { font-size: 11px; fill: #566174; }
   </style>
   <text x="24" y="32" class="title">BulkSaveChanges Performance</text>
   <text x="24" y="52" class="subtitle">Speedup is calculated against SaveChanges for the same scenario and row count. Values below 1x are slower.</text>
-  <line x1="270" y1="74" x2="270" y2="2172" class="grid"/>
-  <text x="270" y="2196" class="tick" text-anchor="middle">0x</text>
-  <line x1="351.25" y1="74" x2="351.25" y2="2172" class="grid"/>
-  <text x="351.25" y="2196" class="tick" text-anchor="middle">1x</text>
-  <line x1="432.5" y1="74" x2="432.5" y2="2172" class="grid"/>
-  <text x="432.5" y="2196" class="tick" text-anchor="middle">2x</text>
-  <line x1="513.75" y1="74" x2="513.75" y2="2172" class="grid"/>
-  <text x="513.75" y="2196" class="tick" text-anchor="middle">3x</text>
-  <line x1="595" y1="74" x2="595" y2="2172" class="grid"/>
-  <text x="595" y="2196" class="tick" text-anchor="middle">4x</text>
-  <line x1="676.25" y1="74" x2="676.25" y2="2172" class="grid"/>
-  <text x="676.25" y="2196" class="tick" text-anchor="middle">5x</text>
-  <line x1="757.5" y1="74" x2="757.5" y2="2172" class="grid"/>
-  <text x="757.5" y="2196" class="tick" text-anchor="middle">6x</text>
-  <line x1="838.75" y1="74" x2="838.75" y2="2172" class="grid"/>
-  <text x="838.75" y="2196" class="tick" text-anchor="middle">7x</text>
-  <line x1="920" y1="74" x2="920" y2="2172" class="grid"/>
-  <text x="920" y="2196" class="tick" text-anchor="middle">8x</text>
-  <line x1="270" y1="74" x2="270" y2="2172" class="axis"/>
-  <text x="24" y="92" class="scenario">Insert</text>
-  <text x="44" y="120" class="row-count">1 row</text>
-  <line x1="142" y1="114" x2="920" y2="114" class="subsection-rule"/>
-  <text x="72" y="138" class="method">SaveChanges</text>
-  <rect x="270" y="124" width="81" height="16" rx="3" fill="#7a8798"/>
-  <text x="359" y="138" class="value">1.00x (0.62 ms)</text>
-  <text x="72" y="166" class="method">BulkSaveChanges</text>
-  <rect x="270" y="152" width="81" height="16" rx="3" fill="#2374ab"/>
-  <text x="359" y="166" class="value">1.00x (0.62 ms)</text>
-  <text x="44" y="220" class="row-count">100 rows</text>
-  <line x1="142" y1="214" x2="920" y2="214" class="subsection-rule"/>
-  <text x="72" y="238" class="method">SaveChanges</text>
-  <rect x="270" y="224" width="81" height="16" rx="3" fill="#7a8798"/>
-  <text x="359" y="238" class="value">1.00x (5.01 ms)</text>
-  <text x="72" y="266" class="method">BulkSaveChanges</text>
-  <rect x="270" y="252" width="326" height="16" rx="3" fill="#2374ab"/>
-  <text x="604" y="266" class="value">4.01x (1.25 ms)</text>
-  <text x="44" y="320" class="row-count">1,000 rows</text>
-  <line x1="142" y1="314" x2="920" y2="314" class="subsection-rule"/>
-  <text x="72" y="338" class="method">SaveChanges</text>
-  <rect x="270" y="324" width="81" height="16" rx="3" fill="#7a8798"/>
-  <text x="359" y="338" class="value">1.00x (35.22 ms)</text>
-  <text x="72" y="366" class="method">BulkSaveChanges (batch 100)</text>
-  <rect x="270" y="352" width="297" height="16" rx="3" fill="#2374ab"/>
-  <text x="575" y="366" class="value">3.65x (9.64 ms)</text>
-  <text x="72" y="394" class="method">BulkSaveChanges</text>
-  <rect x="270" y="380" width="112" height="16" rx="3" fill="#2374ab"/>
-  <text x="390" y="394" class="value">1.38x (25.61 ms)</text>
-  <text x="44" y="448" class="row-count">10,000 rows</text>
-  <line x1="142" y1="442" x2="920" y2="442" class="subsection-rule"/>
-  <text x="72" y="466" class="method">SaveChanges</text>
-  <rect x="270" y="452" width="81" height="16" rx="3" fill="#7a8798"/>
-  <text x="359" y="466" class="value">1.00x (378.37 ms)</text>
-  <text x="72" y="494" class="method">BulkSaveChanges (batch 100)</text>
-  <rect x="270" y="480" width="213" height="16" rx="3" fill="#2374ab"/>
-  <text x="491" y="494" class="value">2.62x (144.16 ms)</text>
-  <text x="72" y="522" class="method">BulkSaveChanges (batch 1,000)</text>
-  <rect x="270" y="508" width="115" height="16" rx="3" fill="#2374ab"/>
-  <text x="393" y="522" class="value">1.41x (268.26 ms)</text>
-  <text x="72" y="550" class="method">BulkSaveChanges</text>
-  <rect x="270" y="536" width="18" height="16" rx="3" fill="#d65f5f"/>
-  <text x="296" y="550" class="value">0.22x (1,736.32 ms)</text>
-  <text x="24" y="626" class="scenario">Update</text>
-  <text x="44" y="654" class="row-count">1 row</text>
-  <line x1="142" y1="648" x2="920" y2="648" class="subsection-rule"/>
-  <text x="72" y="672" class="method">SaveChanges</text>
-  <rect x="270" y="658" width="81" height="16" rx="3" fill="#7a8798"/>
-  <text x="359" y="672" class="value">1.00x (3.43 ms)</text>
-  <text x="72" y="700" class="method">BulkSaveChanges</text>
-  <rect x="270" y="686" width="650" height="16" rx="3" fill="#2374ab"/>
-  <text x="928" y="700" class="value">8.00x (0.43 ms)</text>
-  <text x="44" y="754" class="row-count">100 rows</text>
-  <line x1="142" y1="748" x2="920" y2="748" class="subsection-rule"/>
-  <text x="72" y="772" class="method">SaveChanges</text>
-  <rect x="270" y="758" width="81" height="16" rx="3" fill="#7a8798"/>
-  <text x="359" y="772" class="value">1.00x (5.09 ms)</text>
-  <text x="72" y="800" class="method">BulkSaveChanges</text>
-  <rect x="270" y="786" width="237" height="16" rx="3" fill="#2374ab"/>
-  <text x="515" y="800" class="value">2.92x (1.74 ms)</text>
-  <text x="44" y="854" class="row-count">1,000 rows</text>
-  <line x1="142" y1="848" x2="920" y2="848" class="subsection-rule"/>
-  <text x="72" y="872" class="method">SaveChanges</text>
-  <rect x="270" y="858" width="81" height="16" rx="3" fill="#7a8798"/>
-  <text x="359" y="872" class="value">1.00x (16.52 ms)</text>
-  <text x="72" y="900" class="method">BulkSaveChanges (batch 100)</text>
-  <rect x="270" y="886" width="159" height="16" rx="3" fill="#2374ab"/>
-  <text x="437" y="900" class="value">1.96x (8.42 ms)</text>
-  <text x="72" y="928" class="method">BulkSaveChanges (batch 250)</text>
-  <rect x="270" y="914" width="101" height="16" rx="3" fill="#2374ab"/>
-  <text x="379" y="928" class="value">1.24x (13.32 ms)</text>
-  <text x="44" y="982" class="row-count">10,000 rows</text>
-  <line x1="142" y1="976" x2="920" y2="976" class="subsection-rule"/>
-  <text x="72" y="1000" class="method">SaveChanges</text>
-  <rect x="270" y="986" width="81" height="16" rx="3" fill="#7a8798"/>
-  <text x="359" y="1000" class="value">1.00x (210.75 ms)</text>
-  <text x="72" y="1028" class="method">BulkSaveChanges (batch 100)</text>
-  <rect x="270" y="1014" width="188" height="16" rx="3" fill="#2374ab"/>
-  <text x="466" y="1028" class="value">2.31x (91.24 ms)</text>
-  <text x="72" y="1056" class="method">BulkSaveChanges (batch 250)</text>
-  <rect x="270" y="1042" width="114" height="16" rx="3" fill="#2374ab"/>
-  <text x="392" y="1056" class="value">1.40x (150.94 ms)</text>
-  <text x="24" y="1132" class="scenario">Mixed Add/Update/Delete</text>
-  <text x="44" y="1160" class="row-count">1 row</text>
-  <line x1="142" y1="1154" x2="920" y2="1154" class="subsection-rule"/>
-  <text x="72" y="1178" class="method">SaveChanges</text>
-  <rect x="270" y="1164" width="81" height="16" rx="3" fill="#7a8798"/>
-  <text x="359" y="1178" class="value">1.00x (0.09 ms)</text>
-  <text x="72" y="1206" class="method">BulkSaveChanges</text>
-  <rect x="270" y="1192" width="54" height="16" rx="3" fill="#d65f5f"/>
-  <text x="332" y="1206" class="value">0.66x (0.13 ms)</text>
-  <text x="44" y="1260" class="row-count">100 rows</text>
-  <line x1="142" y1="1254" x2="920" y2="1254" class="subsection-rule"/>
-  <text x="72" y="1278" class="method">SaveChanges</text>
-  <rect x="270" y="1264" width="81" height="16" rx="3" fill="#7a8798"/>
-  <text x="359" y="1278" class="value">1.00x (4.81 ms)</text>
-  <text x="72" y="1306" class="method">BulkSaveChanges</text>
-  <rect x="270" y="1292" width="517" height="16" rx="3" fill="#2374ab"/>
-  <text x="795" y="1306" class="value">6.36x (0.76 ms)</text>
-  <text x="44" y="1360" class="row-count">1,000 rows</text>
-  <line x1="142" y1="1354" x2="920" y2="1354" class="subsection-rule"/>
-  <text x="72" y="1378" class="method">SaveChanges</text>
-  <rect x="270" y="1364" width="81" height="16" rx="3" fill="#7a8798"/>
-  <text x="359" y="1378" class="value">1.00x (9.62 ms)</text>
-  <text x="72" y="1406" class="method">BulkSaveChanges (batch 100)</text>
-  <rect x="270" y="1392" width="142" height="16" rx="3" fill="#2374ab"/>
-  <text x="420" y="1406" class="value">1.75x (5.50 ms)</text>
-  <text x="72" y="1434" class="method">BulkSaveChanges (batch 250)</text>
-  <rect x="270" y="1420" width="107" height="16" rx="3" fill="#2374ab"/>
-  <text x="385" y="1434" class="value">1.32x (7.28 ms)</text>
-  <text x="44" y="1488" class="row-count">10,000 rows</text>
-  <line x1="142" y1="1482" x2="920" y2="1482" class="subsection-rule"/>
-  <text x="72" y="1506" class="method">SaveChanges</text>
-  <rect x="270" y="1492" width="81" height="16" rx="3" fill="#7a8798"/>
-  <text x="359" y="1506" class="value">1.00x (142.60 ms)</text>
-  <text x="72" y="1534" class="method">BulkSaveChanges (batch 100)</text>
-  <rect x="270" y="1520" width="139" height="16" rx="3" fill="#2374ab"/>
-  <text x="417" y="1534" class="value">1.71x (83.62 ms)</text>
-  <text x="72" y="1562" class="method">BulkSaveChanges (batch 250)</text>
-  <rect x="270" y="1548" width="131" height="16" rx="3" fill="#2374ab"/>
-  <text x="409" y="1562" class="value">1.61x (88.50 ms)</text>
-  <text x="24" y="1638" class="scenario">Synchronize</text>
-  <text x="44" y="1666" class="row-count">1 row</text>
-  <line x1="142" y1="1660" x2="920" y2="1660" class="subsection-rule"/>
-  <text x="72" y="1684" class="method">SaveChanges</text>
-  <rect x="270" y="1670" width="81" height="16" rx="3" fill="#7a8798"/>
-  <text x="359" y="1684" class="value">1.00x (2.23 ms)</text>
-  <text x="72" y="1712" class="method">BulkSynchronize</text>
-  <rect x="270" y="1698" width="7" height="16" rx="3" fill="#d65f5f"/>
-  <text x="285" y="1712" class="value">0.09x (25.22 ms)</text>
-  <text x="44" y="1766" class="row-count">100 rows</text>
-  <line x1="142" y1="1760" x2="920" y2="1760" class="subsection-rule"/>
-  <text x="72" y="1784" class="method">SaveChanges</text>
-  <rect x="270" y="1770" width="81" height="16" rx="3" fill="#7a8798"/>
-  <text x="359" y="1784" class="value">1.00x (7.28 ms)</text>
-  <text x="72" y="1812" class="method">BulkSynchronize</text>
-  <rect x="270" y="1798" width="72" height="16" rx="3" fill="#d65f5f"/>
-  <text x="350" y="1812" class="value">0.89x (8.22 ms)</text>
-  <text x="44" y="1866" class="row-count">1,000 rows</text>
-  <line x1="142" y1="1860" x2="920" y2="1860" class="subsection-rule"/>
-  <text x="72" y="1884" class="method">SaveChanges</text>
-  <rect x="270" y="1870" width="81" height="16" rx="3" fill="#7a8798"/>
-  <text x="359" y="1884" class="value">1.00x (44.54 ms)</text>
-  <text x="72" y="1912" class="method">BulkSynchronize (batch 100)</text>
-  <rect x="270" y="1898" width="106" height="16" rx="3" fill="#2374ab"/>
-  <text x="384" y="1912" class="value">1.30x (34.35 ms)</text>
-  <text x="72" y="1940" class="method">BulkSynchronize (batch 250)</text>
-  <rect x="270" y="1926" width="112" height="16" rx="3" fill="#2374ab"/>
-  <text x="390" y="1940" class="value">1.38x (32.18 ms)</text>
-  <text x="44" y="1994" class="row-count">10,000 rows</text>
-  <line x1="142" y1="1988" x2="920" y2="1988" class="subsection-rule"/>
-  <text x="72" y="2012" class="method">SaveChanges</text>
-  <rect x="270" y="1998" width="81" height="16" rx="3" fill="#7a8798"/>
-  <text x="359" y="2012" class="value">1.00x (460.81 ms)</text>
-  <text x="72" y="2040" class="method">BulkSynchronize (batch 100)</text>
-  <rect x="270" y="2026" width="95" height="16" rx="3" fill="#2374ab"/>
-  <text x="373" y="2040" class="value">1.17x (394.89 ms)</text>
-  <text x="72" y="2068" class="method">BulkSynchronize (batch 250)</text>
-  <rect x="270" y="2054" width="137" height="16" rx="3" fill="#2374ab"/>
-  <text x="415" y="2068" class="value">1.69x (273.45 ms)</text>
+  <rect x="24" y="70" width="12" height="12" rx="2" fill="#2374ab"/>
+  <text x="44" y="80" class="legend">SQLite</text>
+  <rect x="104" y="70" width="12" height="12" rx="2" fill="#2f855a"/>
+  <text x="124" y="80" class="legend">PostgreSQL</text>
+  <rect x="218" y="70" width="12" height="12" rx="2" fill="#d65f5f"/>
+  <text x="238" y="80" class="legend">slower than SaveChanges</text>
+  <line x1="340" y1="102" x2="340" y2="3840" class="grid"/>
+  <text x="340" y="3864" class="tick" text-anchor="middle">0x</text>
+  <line x1="427" y1="102" x2="427" y2="3840" class="grid"/>
+  <text x="427" y="3864" class="tick" text-anchor="middle">1x</text>
+  <line x1="514" y1="102" x2="514" y2="3840" class="grid"/>
+  <text x="514" y="3864" class="tick" text-anchor="middle">2x</text>
+  <line x1="601" y1="102" x2="601" y2="3840" class="grid"/>
+  <text x="601" y="3864" class="tick" text-anchor="middle">3x</text>
+  <line x1="688" y1="102" x2="688" y2="3840" class="grid"/>
+  <text x="688" y="3864" class="tick" text-anchor="middle">4x</text>
+  <line x1="775" y1="102" x2="775" y2="3840" class="grid"/>
+  <text x="775" y="3864" class="tick" text-anchor="middle">5x</text>
+  <line x1="862" y1="102" x2="862" y2="3840" class="grid"/>
+  <text x="862" y="3864" class="tick" text-anchor="middle">6x</text>
+  <line x1="949" y1="102" x2="949" y2="3840" class="grid"/>
+  <text x="949" y="3864" class="tick" text-anchor="middle">7x</text>
+  <line x1="1036" y1="102" x2="1036" y2="3840" class="grid"/>
+  <text x="1036" y="3864" class="tick" text-anchor="middle">8x</text>
+  <line x1="340" y1="102" x2="340" y2="3840" class="axis"/>
+  <text x="24" y="120" class="scenario">Insert</text>
+  <text x="44" y="148" class="row-count">1 row</text>
+  <line x1="142" y1="142" x2="1036" y2="142" class="subsection-rule"/>
+  <text x="72" y="166" class="method-heading">SaveChanges</text>
+  <text x="116" y="186" class="database">SQLite</text>
+  <rect x="340" y="172" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="186" class="value" text-anchor="start">1.00x (0.62 ms)</text>
+  <text x="116" y="210" class="database">PostgreSQL</text>
+  <rect x="340" y="196" width="87" height="14" rx="3" fill="#2f855a"/>
+  <text x="435" y="210" class="value" text-anchor="start">1.00x (2.07 ms)</text>
+  <text x="72" y="234" class="method-heading">BulkSaveChanges</text>
+  <text x="116" y="254" class="database">SQLite</text>
+  <rect x="340" y="240" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="254" class="value" text-anchor="start">1.00x (0.62 ms)</text>
+  <text x="116" y="278" class="database">PostgreSQL</text>
+  <rect x="340" y="264" width="68" height="14" rx="3" fill="#d65f5f"/>
+  <text x="416" y="278" class="value" text-anchor="start">0.78x (2.65 ms)</text>
+  <text x="44" y="328" class="row-count">100 rows</text>
+  <line x1="142" y1="322" x2="1036" y2="322" class="subsection-rule"/>
+  <text x="72" y="346" class="method-heading">SaveChanges</text>
+  <text x="116" y="366" class="database">SQLite</text>
+  <rect x="340" y="352" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="366" class="value" text-anchor="start">1.00x (5.01 ms)</text>
+  <text x="116" y="390" class="database">PostgreSQL</text>
+  <rect x="340" y="376" width="87" height="14" rx="3" fill="#2f855a"/>
+  <text x="435" y="390" class="value" text-anchor="start">1.00x (15.33 ms)</text>
+  <text x="72" y="414" class="method-heading">BulkSaveChanges</text>
+  <text x="116" y="434" class="database">SQLite</text>
+  <rect x="340" y="420" width="349" height="14" rx="3" fill="#2374ab"/>
+  <text x="697" y="434" class="value" text-anchor="start">4.01x (1.25 ms)</text>
+  <text x="116" y="458" class="database">PostgreSQL</text>
+  <rect x="340" y="444" width="337" height="14" rx="3" fill="#2f855a"/>
+  <text x="685" y="458" class="value" text-anchor="start">3.87x (3.96 ms)</text>
+  <text x="44" y="508" class="row-count">1,000 rows</text>
+  <line x1="142" y1="502" x2="1036" y2="502" class="subsection-rule"/>
+  <text x="72" y="526" class="method-heading">SaveChanges</text>
+  <text x="116" y="546" class="database">SQLite</text>
+  <rect x="340" y="532" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="546" class="value" text-anchor="start">1.00x (35.22 ms)</text>
+  <text x="116" y="570" class="database">PostgreSQL</text>
+  <rect x="340" y="556" width="87" height="14" rx="3" fill="#2f855a"/>
+  <text x="435" y="570" class="value" text-anchor="start">1.00x (39.68 ms)</text>
+  <text x="72" y="594" class="method-heading">BulkSaveChanges (batch 100)</text>
+  <text x="116" y="614" class="database">SQLite</text>
+  <rect x="340" y="600" width="318" height="14" rx="3" fill="#2374ab"/>
+  <text x="666" y="614" class="value" text-anchor="start">3.65x (9.64 ms)</text>
+  <text x="116" y="638" class="database">PostgreSQL</text>
+  <rect x="340" y="624" width="284" height="14" rx="3" fill="#2f855a"/>
+  <text x="632" y="638" class="value" text-anchor="start">3.26x (12.15 ms)</text>
+  <text x="72" y="662" class="method-heading">BulkSaveChanges</text>
+  <text x="116" y="682" class="database">SQLite</text>
+  <rect x="340" y="668" width="120" height="14" rx="3" fill="#2374ab"/>
+  <text x="468" y="682" class="value" text-anchor="start">1.38x (25.61 ms)</text>
+  <text x="116" y="706" class="database">PostgreSQL</text>
+  <rect x="340" y="692" width="482" height="14" rx="3" fill="#2f855a"/>
+  <text x="830" y="706" class="value" text-anchor="start">5.54x (7.16 ms)</text>
+  <text x="44" y="756" class="row-count">10,000 rows</text>
+  <line x1="142" y1="750" x2="1036" y2="750" class="subsection-rule"/>
+  <text x="72" y="774" class="method-heading">SaveChanges</text>
+  <text x="116" y="794" class="database">SQLite</text>
+  <rect x="340" y="780" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="794" class="value" text-anchor="start">1.00x (378.37 ms)</text>
+  <text x="116" y="818" class="database">PostgreSQL</text>
+  <rect x="340" y="804" width="87" height="14" rx="3" fill="#2f855a"/>
+  <text x="435" y="818" class="value" text-anchor="start">1.00x (277.68 ms)</text>
+  <text x="72" y="842" class="method-heading">BulkSaveChanges (batch 100)</text>
+  <text x="116" y="862" class="database">SQLite</text>
+  <rect x="340" y="848" width="228" height="14" rx="3" fill="#2374ab"/>
+  <text x="576" y="862" class="value" text-anchor="start">2.62x (144.16 ms)</text>
+  <text x="116" y="886" class="database">PostgreSQL</text>
+  <rect x="340" y="872" width="243" height="14" rx="3" fill="#2f855a"/>
+  <text x="591" y="886" class="value" text-anchor="start">2.79x (99.58 ms)</text>
+  <text x="72" y="910" class="method-heading">BulkSaveChanges (batch 1,000)</text>
+  <text x="116" y="930" class="database">SQLite</text>
+  <rect x="340" y="916" width="123" height="14" rx="3" fill="#2374ab"/>
+  <text x="471" y="930" class="value" text-anchor="start">1.41x (268.26 ms)</text>
+  <text x="116" y="954" class="database">PostgreSQL</text>
+  <rect x="340" y="940" width="340" height="14" rx="3" fill="#2f855a"/>
+  <text x="688" y="954" class="value" text-anchor="start">3.91x (71.09 ms)</text>
+  <text x="72" y="978" class="method-heading">BulkSaveChanges</text>
+  <text x="116" y="998" class="database">SQLite</text>
+  <rect x="340" y="984" width="19" height="14" rx="3" fill="#d65f5f"/>
+  <text x="367" y="998" class="value" text-anchor="start">0.22x (1,736.32 ms)</text>
+  <text x="116" y="1022" class="database">PostgreSQL</text>
+  <rect x="340" y="1008" width="343" height="14" rx="3" fill="#2f855a"/>
+  <text x="691" y="1022" class="value" text-anchor="start">3.94x (70.44 ms)</text>
+  <text x="24" y="1094" class="scenario">Update</text>
+  <text x="44" y="1122" class="row-count">1 row</text>
+  <line x1="142" y1="1116" x2="1036" y2="1116" class="subsection-rule"/>
+  <text x="72" y="1140" class="method-heading">SaveChanges</text>
+  <text x="116" y="1160" class="database">SQLite</text>
+  <rect x="340" y="1146" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="1160" class="value" text-anchor="start">1.00x (3.43 ms)</text>
+  <text x="116" y="1184" class="database">PostgreSQL</text>
+  <rect x="340" y="1170" width="87" height="14" rx="3" fill="#2f855a"/>
+  <text x="435" y="1184" class="value" text-anchor="start">1.00x (2.68 ms)</text>
+  <text x="72" y="1208" class="method-heading">BulkSaveChanges</text>
+  <text x="116" y="1228" class="database">SQLite</text>
+  <rect x="340" y="1214" width="696" height="14" rx="3" fill="#2374ab"/>
+  <text x="1028" y="1228" class="value-inside" text-anchor="end">8.00x (0.43 ms)</text>
+  <text x="116" y="1252" class="database">PostgreSQL</text>
+  <rect x="340" y="1238" width="159" height="14" rx="3" fill="#2f855a"/>
+  <text x="507" y="1252" class="value" text-anchor="start">1.83x (1.47 ms)</text>
+  <text x="44" y="1302" class="row-count">100 rows</text>
+  <line x1="142" y1="1296" x2="1036" y2="1296" class="subsection-rule"/>
+  <text x="72" y="1320" class="method-heading">SaveChanges</text>
+  <text x="116" y="1340" class="database">SQLite</text>
+  <rect x="340" y="1326" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="1340" class="value" text-anchor="start">1.00x (5.09 ms)</text>
+  <text x="116" y="1364" class="database">PostgreSQL</text>
+  <rect x="340" y="1350" width="87" height="14" rx="3" fill="#2f855a"/>
+  <text x="435" y="1364" class="value" text-anchor="start">1.00x (3.91 ms)</text>
+  <text x="72" y="1388" class="method-heading">BulkSaveChanges</text>
+  <text x="116" y="1408" class="database">SQLite</text>
+  <rect x="340" y="1394" width="254" height="14" rx="3" fill="#2374ab"/>
+  <text x="602" y="1408" class="value" text-anchor="start">2.92x (1.74 ms)</text>
+  <text x="116" y="1432" class="database">PostgreSQL</text>
+  <rect x="340" y="1418" width="99" height="14" rx="3" fill="#2f855a"/>
+  <text x="447" y="1432" class="value" text-anchor="start">1.14x (3.42 ms)</text>
+  <text x="44" y="1482" class="row-count">1,000 rows</text>
+  <line x1="142" y1="1476" x2="1036" y2="1476" class="subsection-rule"/>
+  <text x="72" y="1500" class="method-heading">SaveChanges</text>
+  <text x="116" y="1520" class="database">SQLite</text>
+  <rect x="340" y="1506" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="1520" class="value" text-anchor="start">1.00x (16.52 ms)</text>
+  <text x="116" y="1544" class="database">PostgreSQL</text>
+  <rect x="340" y="1530" width="87" height="14" rx="3" fill="#2f855a"/>
+  <text x="435" y="1544" class="value" text-anchor="start">1.00x (32.71 ms)</text>
+  <text x="72" y="1568" class="method-heading">BulkSaveChanges (batch 100)</text>
+  <text x="116" y="1588" class="database">SQLite</text>
+  <rect x="340" y="1574" width="171" height="14" rx="3" fill="#2374ab"/>
+  <text x="519" y="1588" class="value" text-anchor="start">1.96x (8.42 ms)</text>
+  <text x="116" y="1612" class="database">PostgreSQL</text>
+  <rect x="340" y="1598" width="116" height="14" rx="3" fill="#2f855a"/>
+  <text x="464" y="1612" class="value" text-anchor="start">1.33x (24.52 ms)</text>
+  <text x="72" y="1636" class="method-heading">BulkSaveChanges (batch 250)</text>
+  <text x="116" y="1656" class="database">SQLite</text>
+  <rect x="340" y="1642" width="108" height="14" rx="3" fill="#2374ab"/>
+  <text x="456" y="1656" class="value" text-anchor="start">1.24x (13.32 ms)</text>
+  <text x="116" y="1680" class="database">PostgreSQL</text>
+  <rect x="340" y="1666" width="131" height="14" rx="3" fill="#2f855a"/>
+  <text x="479" y="1680" class="value" text-anchor="start">1.51x (21.71 ms)</text>
+  <text x="44" y="1730" class="row-count">10,000 rows</text>
+  <line x1="142" y1="1724" x2="1036" y2="1724" class="subsection-rule"/>
+  <text x="72" y="1748" class="method-heading">SaveChanges</text>
+  <text x="116" y="1768" class="database">SQLite</text>
+  <rect x="340" y="1754" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="1768" class="value" text-anchor="start">1.00x (210.75 ms)</text>
+  <text x="116" y="1792" class="database">PostgreSQL</text>
+  <rect x="340" y="1778" width="87" height="14" rx="3" fill="#2f855a"/>
+  <text x="435" y="1792" class="value" text-anchor="start">1.00x (292.45 ms)</text>
+  <text x="72" y="1816" class="method-heading">BulkSaveChanges (batch 100)</text>
+  <text x="116" y="1836" class="database">SQLite</text>
+  <rect x="340" y="1822" width="201" height="14" rx="3" fill="#2374ab"/>
+  <text x="549" y="1836" class="value" text-anchor="start">2.31x (91.24 ms)</text>
+  <text x="116" y="1860" class="database">PostgreSQL</text>
+  <rect x="340" y="1846" width="86" height="14" rx="3" fill="#d65f5f"/>
+  <text x="434" y="1860" class="value" text-anchor="start">0.99x (295.42 ms)</text>
+  <text x="72" y="1884" class="method-heading">BulkSaveChanges (batch 250)</text>
+  <text x="116" y="1904" class="database">SQLite</text>
+  <rect x="340" y="1890" width="122" height="14" rx="3" fill="#2374ab"/>
+  <text x="470" y="1904" class="value" text-anchor="start">1.40x (150.94 ms)</text>
+  <text x="116" y="1928" class="database">PostgreSQL</text>
+  <rect x="340" y="1914" width="105" height="14" rx="3" fill="#2f855a"/>
+  <text x="453" y="1928" class="value" text-anchor="start">1.21x (241.43 ms)</text>
+  <text x="24" y="2000" class="scenario">Mixed Add/Update/Delete</text>
+  <text x="44" y="2028" class="row-count">1 row</text>
+  <line x1="142" y1="2022" x2="1036" y2="2022" class="subsection-rule"/>
+  <text x="72" y="2046" class="method-heading">SaveChanges</text>
+  <text x="116" y="2066" class="database">SQLite</text>
+  <rect x="340" y="2052" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="2066" class="value" text-anchor="start">1.00x (0.09 ms)</text>
+  <text x="116" y="2090" class="database">PostgreSQL</text>
+  <rect x="340" y="2076" width="87" height="14" rx="3" fill="#2f855a"/>
+  <text x="435" y="2090" class="value" text-anchor="start">1.00x (1.07 ms)</text>
+  <text x="72" y="2114" class="method-heading">BulkSaveChanges</text>
+  <text x="116" y="2134" class="database">SQLite</text>
+  <rect x="340" y="2120" width="57" height="14" rx="3" fill="#d65f5f"/>
+  <text x="405" y="2134" class="value" text-anchor="start">0.66x (0.13 ms)</text>
+  <text x="116" y="2158" class="database">PostgreSQL</text>
+  <rect x="340" y="2144" width="59" height="14" rx="3" fill="#d65f5f"/>
+  <text x="407" y="2158" class="value" text-anchor="start">0.68x (1.59 ms)</text>
+  <text x="44" y="2208" class="row-count">100 rows</text>
+  <line x1="142" y1="2202" x2="1036" y2="2202" class="subsection-rule"/>
+  <text x="72" y="2226" class="method-heading">SaveChanges</text>
+  <text x="116" y="2246" class="database">SQLite</text>
+  <rect x="340" y="2232" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="2246" class="value" text-anchor="start">1.00x (4.81 ms)</text>
+  <text x="116" y="2270" class="database">PostgreSQL</text>
+  <rect x="340" y="2256" width="87" height="14" rx="3" fill="#2f855a"/>
+  <text x="435" y="2270" class="value" text-anchor="start">1.00x (8.56 ms)</text>
+  <text x="72" y="2294" class="method-heading">BulkSaveChanges</text>
+  <text x="116" y="2314" class="database">SQLite</text>
+  <rect x="340" y="2300" width="553" height="14" rx="3" fill="#2374ab"/>
+  <text x="901" y="2314" class="value" text-anchor="start">6.36x (0.76 ms)</text>
+  <text x="116" y="2338" class="database">PostgreSQL</text>
+  <rect x="340" y="2324" width="218" height="14" rx="3" fill="#2f855a"/>
+  <text x="566" y="2338" class="value" text-anchor="start">2.50x (3.43 ms)</text>
+  <text x="44" y="2388" class="row-count">1,000 rows</text>
+  <line x1="142" y1="2382" x2="1036" y2="2382" class="subsection-rule"/>
+  <text x="72" y="2406" class="method-heading">SaveChanges</text>
+  <text x="116" y="2426" class="database">SQLite</text>
+  <rect x="340" y="2412" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="2426" class="value" text-anchor="start">1.00x (9.62 ms)</text>
+  <text x="116" y="2450" class="database">PostgreSQL</text>
+  <rect x="340" y="2436" width="87" height="14" rx="3" fill="#2f855a"/>
+  <text x="435" y="2450" class="value" text-anchor="start">1.00x (24.74 ms)</text>
+  <text x="72" y="2474" class="method-heading">BulkSaveChanges (batch 100)</text>
+  <text x="116" y="2494" class="database">SQLite</text>
+  <rect x="340" y="2480" width="152" height="14" rx="3" fill="#2374ab"/>
+  <text x="500" y="2494" class="value" text-anchor="start">1.75x (5.50 ms)</text>
+  <text x="116" y="2518" class="database">PostgreSQL</text>
+  <rect x="340" y="2504" width="125" height="14" rx="3" fill="#2f855a"/>
+  <text x="473" y="2518" class="value" text-anchor="start">1.44x (17.17 ms)</text>
+  <text x="72" y="2542" class="method-heading">BulkSaveChanges (batch 250)</text>
+  <text x="116" y="2562" class="database">SQLite</text>
+  <rect x="340" y="2548" width="115" height="14" rx="3" fill="#2374ab"/>
+  <text x="463" y="2562" class="value" text-anchor="start">1.32x (7.28 ms)</text>
+  <text x="116" y="2586" class="database">PostgreSQL</text>
+  <rect x="340" y="2572" width="177" height="14" rx="3" fill="#2f855a"/>
+  <text x="525" y="2586" class="value" text-anchor="start">2.03x (12.16 ms)</text>
+  <text x="44" y="2636" class="row-count">10,000 rows</text>
+  <line x1="142" y1="2630" x2="1036" y2="2630" class="subsection-rule"/>
+  <text x="72" y="2654" class="method-heading">SaveChanges</text>
+  <text x="116" y="2674" class="database">SQLite</text>
+  <rect x="340" y="2660" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="2674" class="value" text-anchor="start">1.00x (142.60 ms)</text>
+  <text x="116" y="2698" class="database">PostgreSQL</text>
+  <rect x="340" y="2684" width="87" height="14" rx="3" fill="#2f855a"/>
+  <text x="435" y="2698" class="value" text-anchor="start">1.00x (262.10 ms)</text>
+  <text x="72" y="2722" class="method-heading">BulkSaveChanges (batch 100)</text>
+  <text x="116" y="2742" class="database">SQLite</text>
+  <rect x="340" y="2728" width="149" height="14" rx="3" fill="#2374ab"/>
+  <text x="497" y="2742" class="value" text-anchor="start">1.71x (83.62 ms)</text>
+  <text x="116" y="2766" class="database">PostgreSQL</text>
+  <rect x="340" y="2752" width="110" height="14" rx="3" fill="#2f855a"/>
+  <text x="458" y="2766" class="value" text-anchor="start">1.27x (206.83 ms)</text>
+  <text x="72" y="2790" class="method-heading">BulkSaveChanges (batch 250)</text>
+  <text x="116" y="2810" class="database">SQLite</text>
+  <rect x="340" y="2796" width="140" height="14" rx="3" fill="#2374ab"/>
+  <text x="488" y="2810" class="value" text-anchor="start">1.61x (88.50 ms)</text>
+  <text x="116" y="2834" class="database">PostgreSQL</text>
+  <rect x="340" y="2820" width="166" height="14" rx="3" fill="#2f855a"/>
+  <text x="514" y="2834" class="value" text-anchor="start">1.91x (137.29 ms)</text>
+  <text x="24" y="2906" class="scenario">Synchronize</text>
+  <text x="44" y="2934" class="row-count">1 row</text>
+  <line x1="142" y1="2928" x2="1036" y2="2928" class="subsection-rule"/>
+  <text x="72" y="2952" class="method-heading">SaveChanges</text>
+  <text x="116" y="2972" class="database">SQLite</text>
+  <rect x="340" y="2958" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="2972" class="value" text-anchor="start">1.00x (7.35 ms)</text>
+  <text x="116" y="2996" class="database">PostgreSQL</text>
+  <rect x="340" y="2982" width="87" height="14" rx="3" fill="#2f855a"/>
+  <text x="435" y="2996" class="value" text-anchor="start">1.00x (9.25 ms)</text>
+  <text x="72" y="3020" class="method-heading">BulkSynchronize</text>
+  <text x="116" y="3040" class="database">SQLite</text>
+  <rect x="340" y="3026" width="26" height="14" rx="3" fill="#d65f5f"/>
+  <text x="374" y="3040" class="value" text-anchor="start">0.30x (24.81 ms)</text>
+  <text x="116" y="3064" class="database">PostgreSQL</text>
+  <rect x="340" y="3050" width="26" height="14" rx="3" fill="#d65f5f"/>
+  <text x="374" y="3064" class="value" text-anchor="start">0.30x (31.02 ms)</text>
+  <text x="44" y="3114" class="row-count">100 rows</text>
+  <line x1="142" y1="3108" x2="1036" y2="3108" class="subsection-rule"/>
+  <text x="72" y="3132" class="method-heading">SaveChanges</text>
+  <text x="116" y="3152" class="database">SQLite</text>
+  <rect x="340" y="3138" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="3152" class="value" text-anchor="start">1.00x (7.95 ms)</text>
+  <text x="116" y="3176" class="database">PostgreSQL</text>
+  <rect x="340" y="3162" width="87" height="14" rx="3" fill="#2f855a"/>
+  <text x="435" y="3176" class="value" text-anchor="start">1.00x (18.79 ms)</text>
+  <text x="72" y="3200" class="method-heading">BulkSynchronize</text>
+  <text x="116" y="3220" class="database">SQLite</text>
+  <rect x="340" y="3206" width="86" height="14" rx="3" fill="#d65f5f"/>
+  <text x="434" y="3220" class="value" text-anchor="start">0.99x (8.05 ms)</text>
+  <text x="116" y="3244" class="database">PostgreSQL</text>
+  <rect x="340" y="3230" width="84" height="14" rx="3" fill="#d65f5f"/>
+  <text x="432" y="3244" class="value" text-anchor="start">0.97x (19.34 ms)</text>
+  <text x="44" y="3294" class="row-count">1,000 rows</text>
+  <line x1="142" y1="3288" x2="1036" y2="3288" class="subsection-rule"/>
+  <text x="72" y="3312" class="method-heading">SaveChanges</text>
+  <text x="116" y="3332" class="database">SQLite</text>
+  <rect x="340" y="3318" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="3332" class="value" text-anchor="start">1.00x (47.77 ms)</text>
+  <text x="116" y="3356" class="database">PostgreSQL</text>
+  <rect x="340" y="3342" width="87" height="14" rx="3" fill="#2f855a"/>
+  <text x="435" y="3356" class="value" text-anchor="start">1.00x (55.88 ms)</text>
+  <text x="72" y="3380" class="method-heading">BulkSynchronize (batch 100)</text>
+  <text x="116" y="3400" class="database">SQLite</text>
+  <rect x="340" y="3386" width="119" height="14" rx="3" fill="#2374ab"/>
+  <text x="467" y="3400" class="value" text-anchor="start">1.37x (34.95 ms)</text>
+  <text x="116" y="3424" class="database">PostgreSQL</text>
+  <rect x="340" y="3410" width="109" height="14" rx="3" fill="#2f855a"/>
+  <text x="457" y="3424" class="value" text-anchor="start">1.25x (44.86 ms)</text>
+  <text x="72" y="3448" class="method-heading">BulkSynchronize (batch 250)</text>
+  <text x="116" y="3468" class="database">SQLite</text>
+  <rect x="340" y="3454" width="97" height="14" rx="3" fill="#2374ab"/>
+  <text x="445" y="3468" class="value" text-anchor="start">1.12x (42.48 ms)</text>
+  <text x="116" y="3492" class="database">PostgreSQL</text>
+  <rect x="340" y="3478" width="174" height="14" rx="3" fill="#2f855a"/>
+  <text x="522" y="3492" class="value" text-anchor="start">2.00x (27.88 ms)</text>
+  <text x="44" y="3542" class="row-count">10,000 rows</text>
+  <line x1="142" y1="3536" x2="1036" y2="3536" class="subsection-rule"/>
+  <text x="72" y="3560" class="method-heading">SaveChanges</text>
+  <text x="116" y="3580" class="database">SQLite</text>
+  <rect x="340" y="3566" width="87" height="14" rx="3" fill="#2374ab"/>
+  <text x="435" y="3580" class="value" text-anchor="start">1.00x (654.93 ms)</text>
+  <text x="116" y="3604" class="database">PostgreSQL</text>
+  <rect x="340" y="3590" width="87" height="14" rx="3" fill="#2f855a"/>
+  <text x="435" y="3604" class="value" text-anchor="start">1.00x (443.74 ms)</text>
+  <text x="72" y="3628" class="method-heading">BulkSynchronize (batch 100)</text>
+  <text x="116" y="3648" class="database">SQLite</text>
+  <rect x="340" y="3634" width="171" height="14" rx="3" fill="#2374ab"/>
+  <text x="519" y="3648" class="value" text-anchor="start">1.96x (334.68 ms)</text>
+  <text x="116" y="3672" class="database">PostgreSQL</text>
+  <rect x="340" y="3658" width="92" height="14" rx="3" fill="#2f855a"/>
+  <text x="440" y="3672" class="value" text-anchor="start">1.06x (418.43 ms)</text>
+  <text x="72" y="3696" class="method-heading">BulkSynchronize (batch 250)</text>
+  <text x="116" y="3716" class="database">SQLite</text>
+  <rect x="340" y="3702" width="238" height="14" rx="3" fill="#2374ab"/>
+  <text x="586" y="3716" class="value" text-anchor="start">2.74x (238.75 ms)</text>
+  <text x="116" y="3740" class="database">PostgreSQL</text>
+  <rect x="340" y="3726" width="142" height="14" rx="3" fill="#2f855a"/>
+  <text x="490" y="3740" class="value" text-anchor="start">1.63x (271.75 ms)</text>
 </svg>
 
