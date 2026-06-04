@@ -202,9 +202,9 @@ dotnet test
 
 The tests assert generated SQL and parameter values without requiring a running PostgreSQL or CockroachDB instance.
 
-## Performance Results
+## SQLite Performance Results
 
-These results come from `BulkSaveChangesPerformanceTests` using SQLite in-memory databases on a local development machine. Timings are smoke-test measurements, not BenchmarkDotNet results. Each measurement times only the save call after entities have been staged in the change tracker. Update and mixed scenarios use smaller bulk batch sizes because SQLite limits the number of `UNION ALL` terms in the generated update shape.
+These results are SQLite-specific. They come from `BulkSaveChangesPerformanceTests` using SQLite in-memory databases on a local development machine, so they should not be read as PostgreSQL, SQL Server, CockroachDB, or general database benchmark results. Timings are smoke-test measurements, not BenchmarkDotNet results. Each measurement times only the save call after entities have been staged in the change tracker. Update, mixed, and synchronize scenarios use smaller bulk batch sizes because SQLite limits the number of `UNION ALL` terms in the generated update shape.
 
 ![BulkSaveChanges performance chart](docs/performance-results.svg)
 
@@ -253,3 +253,18 @@ These results come from `BulkSaveChangesPerformanceTests` using SQLite in-memory
 | 10,000 | SaveChanges |  | 142.60 | 1x |
 | 10,000 | BulkSaveChanges | 100 | 83.62 | 1.71x |
 | 10,000 | BulkSaveChanges | 250 | 88.50 | 1.61x |
+
+### Synchronize
+
+| Rows | Method | Batch Size | Elapsed ms | Speedup |
+| ---: | --- | ---: | ---: | ---: |
+| 1 | SaveChanges |  | 2.23 | 1x |
+| 1 | BulkSynchronize | 100 | 25.22 | 0.09x |
+| 100 | SaveChanges |  | 7.28 | 1x |
+| 100 | BulkSynchronize | 100 | 8.22 | 0.89x |
+| 1,000 | SaveChanges |  | 44.54 | 1x |
+| 1,000 | BulkSynchronize | 100 | 34.35 | 1.30x |
+| 1,000 | BulkSynchronize | 250 | 32.18 | 1.38x |
+| 10,000 | SaveChanges |  | 460.81 | 1x |
+| 10,000 | BulkSynchronize | 100 | 394.89 | 1.17x |
+| 10,000 | BulkSynchronize | 250 | 273.45 | 1.69x |

@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\buildMultiTargeting\EfSimpleBulkSaveChanges.Api.props" />
-</Project>

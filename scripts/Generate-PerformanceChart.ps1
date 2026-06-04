@@ -22,12 +22,12 @@ $scenario = $null
 $inPerformanceSection = $false
 
 foreach ($line in Get-Content -LiteralPath $ReadmePath) {
-    if ($line -eq "## Performance Results") {
+    if ($line -eq "## Performance Results" -or $line -eq "## SQLite Performance Results") {
         $inPerformanceSection = $true
         continue
     }
 
-    if ($inPerformanceSection -and $line.StartsWith("## ") -and $line -ne "## Performance Results") {
+    if ($inPerformanceSection -and $line.StartsWith("## ") -and $line -ne "## Performance Results" -and $line -ne "## SQLite Performance Results") {
         break
     }
 
@@ -53,11 +53,18 @@ foreach ($line in Get-Content -LiteralPath $ReadmePath) {
     $batchSize = $cells[2]
     $elapsedMs = Parse-Number $cells[3]
     $speedup = Parse-Number $cells[4].TrimEnd("x")
-    $methodLabel = if ([string]::IsNullOrWhiteSpace($batchSize)) {
+    $rowCount = [int](Parse-Number $cells[0])
+    $showBatchSize = -not [string]::IsNullOrWhiteSpace($batchSize)
+    if ($showBatchSize) {
+        $batchSizeValue = [int](Parse-Number $batchSize)
+        $showBatchSize = $batchSizeValue -lt $rowCount
+    }
+
+    $methodLabel = if (-not $showBatchSize) {
         $method
     }
     else {
-        "Bulk batch $batchSize"
+        "$method (batch $batchSize)"
     }
 
     $rowLabel = if ($cells[0] -eq "1") { "1 row" } else { "$($cells[0]) rows" }
@@ -82,10 +89,14 @@ $left = 270
 $right = 40
 $top = 74
 $rowHeight = 28
+$scenarioHeaderHeight = 30
 $scenarioGap = 24
+$rowGroupHeaderHeight = 34
+$rowGroupGap = 10
 $axisWidth = $chartWidth - $left - $right
 $groupedRows = $rows | Group-Object Scenario
-$chartHeight = $top + ($rows.Count * $rowHeight) + ($groupedRows.Count * $scenarioGap) + 78
+$rowGroupCount = ($groupedRows | ForEach-Object { ($_.Group | Group-Object Rows).Count } | Measure-Object -Sum).Sum
+$chartHeight = $top + ($rows.Count * $rowHeight) + ($rowGroupCount * ($rowGroupHeaderHeight + $rowGroupGap)) + ($groupedRows.Count * ($scenarioHeaderHeight + $scenarioGap)) + 78
 
 $outputDirectory = Split-Path -Parent $OutputPath
 if ($outputDirectory) {
@@ -95,15 +106,16 @@ if ($outputDirectory) {
 $svg = New-Object System.Text.StringBuilder
 [void]$svg.AppendLine("<svg xmlns=""http://www.w3.org/2000/svg"" width=""$chartWidth"" height=""$chartHeight"" viewBox=""0 0 $chartWidth $chartHeight"" role=""img"" aria-labelledby=""title desc"">")
 [void]$svg.AppendLine("  <title id=""title"">BulkSaveChanges performance results</title>")
-[void]$svg.AppendLine("  <desc id=""desc"">Horizontal bar chart showing speedup versus SaveChanges for insert, update, and mixed save scenarios.</desc>")
+[void]$svg.AppendLine("  <desc id=""desc"">Horizontal bar chart showing speedup versus SaveChanges for save and synchronize scenarios.</desc>")
 [void]$svg.AppendLine("  <rect width=""100%"" height=""100%"" fill=""#ffffff""/>")
 [void]$svg.AppendLine("  <style>")
 [void]$svg.AppendLine("    text { font-family: Segoe UI, Arial, sans-serif; fill: #172033; }")
 [void]$svg.AppendLine("    .title { font-size: 22px; font-weight: 700; }")
 [void]$svg.AppendLine("    .subtitle { font-size: 13px; fill: #566174; }")
 [void]$svg.AppendLine("    .scenario { font-size: 15px; font-weight: 700; }")
-[void]$svg.AppendLine("    .row-count { font-size: 12px; font-weight: 600; fill: #394255; }")
+[void]$svg.AppendLine("    .row-count { font-size: 13px; font-weight: 700; fill: #394255; }")
 [void]$svg.AppendLine("    .method { font-size: 12px; fill: #566174; }")
+[void]$svg.AppendLine("    .subsection-rule { stroke: #e2e8f0; stroke-width: 1; }")
 [void]$svg.AppendLine("    .axis { stroke: #c9d1dd; stroke-width: 1; }")
 [void]$svg.AppendLine("    .grid { stroke: #edf1f6; stroke-width: 1; }")
 [void]$svg.AppendLine("    .tick { font-size: 11px; fill: #697386; }")
@@ -123,21 +135,30 @@ for ($tick = 0; $tick -le $maxSpeedup; $tick++) {
 $y = $top
 foreach ($group in $groupedRows) {
     [void]$svg.AppendLine("  <text x=""24"" y=""$($y + 18)"" class=""scenario"">$(Escape-Xml $group.Name)</text>")
-    $y += $scenarioGap + 16
+    $y += $scenarioHeaderHeight
 
-    foreach ($row in $group.Group) {
-        $barWidth = [Math]::Max(1, ($row.Speedup / $maxSpeedup) * $axisWidth)
-        $barColor = if ($row.Method -eq "SaveChanges") { "#7a8798" } elseif ($row.Speedup -lt 1) { "#d65f5f" } else { "#2374ab" }
-        $barY = $y - 14
-        $rowCount = Escape-Xml $row.Rows
-        $methodLabel = Escape-Xml $row.MethodLabel
-        $value = Escape-Xml ("{0:N2}x ({1:N2} ms)" -f $row.Speedup, $row.ElapsedMs)
+    foreach ($rowGroup in ($group.Group | Group-Object Rows)) {
+        $rowCount = Escape-Xml $rowGroup.Name
+        $ruleY = $y + 10
 
-        [void]$svg.AppendLine("  <text x=""84"" y=""$y"" class=""row-count"" text-anchor=""end"">$rowCount</text>")
-        [void]$svg.AppendLine("  <text x=""104"" y=""$y"" class=""method"">$methodLabel</text>")
-        [void]$svg.AppendLine("  <rect x=""$left"" y=""$barY"" width=""$barWidth"" height=""16"" rx=""3"" fill=""$barColor""/>")
-        [void]$svg.AppendLine("  <text x=""$($left + $barWidth + 8)"" y=""$y"" class=""value"">$value</text>")
-        $y += $rowHeight
+        [void]$svg.AppendLine("  <text x=""44"" y=""$($y + 16)"" class=""row-count"">$rowCount</text>")
+        [void]$svg.AppendLine("  <line x1=""142"" y1=""$ruleY"" x2=""$($chartWidth - $right)"" y2=""$ruleY"" class=""subsection-rule""/>")
+        $y += $rowGroupHeaderHeight
+
+        foreach ($row in $rowGroup.Group) {
+            $barWidth = [Math]::Max(1, ($row.Speedup / $maxSpeedup) * $axisWidth)
+            $barColor = if ($row.Method -eq "SaveChanges") { "#7a8798" } elseif ($row.Speedup -lt 1) { "#d65f5f" } else { "#2374ab" }
+            $barY = $y - 14
+            $methodLabel = Escape-Xml $row.MethodLabel
+            $value = Escape-Xml ("{0:N2}x ({1:N2} ms)" -f $row.Speedup, $row.ElapsedMs)
+
+            [void]$svg.AppendLine("  <text x=""72"" y=""$y"" class=""method"">$methodLabel</text>")
+            [void]$svg.AppendLine("  <rect x=""$left"" y=""$barY"" width=""$barWidth"" height=""16"" rx=""3"" fill=""$barColor""/>")
+            [void]$svg.AppendLine("  <text x=""$($left + $barWidth + 8)"" y=""$y"" class=""value"">$value</text>")
+            $y += $rowHeight
+        }
+
+        $y += $rowGroupGap
     }
 
     $y += $scenarioGap - 4
