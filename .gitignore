@@ -1,0 +1,41 @@
+# Build output
+bin/
+obj/
+
+# Test output
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+coverage/
+coverage.cobertura.xml
+
+# User-local files
+*.user
+*.suo
+*.rsuser
+*.userosscache
+*.sln.docstates
+
+# Visual Studio
+.vs/
+
+# Rider / ReSharper
+.idea/
+_ReSharper*/
+*.DotSettings.user
+
+# VS Code
+.vscode/
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

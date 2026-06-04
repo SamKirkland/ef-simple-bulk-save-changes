@@ -201,3 +201,55 @@ dotnet test
 ```
 
 The tests assert generated SQL and parameter values without requiring a running PostgreSQL or CockroachDB instance.
+
+## Performance Results
+
+These results come from `BulkSaveChangesPerformanceTests` using SQLite in-memory databases on a local development machine. Timings are smoke-test measurements, not BenchmarkDotNet results. Each measurement times only the save call after entities have been staged in the change tracker. Update and mixed scenarios use smaller bulk batch sizes because SQLite limits the number of `UNION ALL` terms in the generated update shape.
+
+![BulkSaveChanges performance chart](docs/performance-results.svg)
+
+### Insert
+
+| Rows | Method | Batch Size | Elapsed ms | Speedup |
+| ---: | --- | ---: | ---: | ---: |
+| 1 | SaveChanges |  | 0.62 | 1x |
+| 1 | BulkSaveChanges | 100 | 0.62 | 1.00x |
+| 100 | SaveChanges |  | 5.01 | 1x |
+| 100 | BulkSaveChanges | 100 | 1.25 | 4.01x |
+| 1,000 | SaveChanges |  | 35.22 | 1x |
+| 1,000 | BulkSaveChanges | 100 | 9.64 | 3.65x |
+| 1,000 | BulkSaveChanges | 1,000 | 25.61 | 1.38x |
+| 10,000 | SaveChanges |  | 378.37 | 1x |
+| 10,000 | BulkSaveChanges | 100 | 144.16 | 2.62x |
+| 10,000 | BulkSaveChanges | 1,000 | 268.26 | 1.41x |
+| 10,000 | BulkSaveChanges | 10,000 | 1,736.32 | 0.22x |
+
+### Update
+
+| Rows | Method | Batch Size | Elapsed ms | Speedup |
+| ---: | --- | ---: | ---: | ---: |
+| 1 | SaveChanges |  | 3.43 | 1x |
+| 1 | BulkSaveChanges | 100 | 0.43 | 8.00x |
+| 100 | SaveChanges |  | 5.09 | 1x |
+| 100 | BulkSaveChanges | 100 | 1.74 | 2.92x |
+| 1,000 | SaveChanges |  | 16.52 | 1x |
+| 1,000 | BulkSaveChanges | 100 | 8.42 | 1.96x |
+| 1,000 | BulkSaveChanges | 250 | 13.32 | 1.24x |
+| 10,000 | SaveChanges |  | 210.75 | 1x |
+| 10,000 | BulkSaveChanges | 100 | 91.24 | 2.31x |
+| 10,000 | BulkSaveChanges | 250 | 150.94 | 1.40x |
+
+### Mixed Add/Update/Delete
+
+| Rows | Method | Batch Size | Elapsed ms | Speedup |
+| ---: | --- | ---: | ---: | ---: |
+| 1 | SaveChanges |  | 0.09 | 1x |
+| 1 | BulkSaveChanges | 100 | 0.13 | 0.66x |
+| 100 | SaveChanges |  | 4.81 | 1x |
+| 100 | BulkSaveChanges | 100 | 0.76 | 6.36x |
+| 1,000 | SaveChanges |  | 9.62 | 1x |
+| 1,000 | BulkSaveChanges | 100 | 5.50 | 1.75x |
+| 1,000 | BulkSaveChanges | 250 | 7.28 | 1.32x |
+| 10,000 | SaveChanges |  | 142.60 | 1x |
+| 10,000 | BulkSaveChanges | 100 | 83.62 | 1.71x |
+| 10,000 | BulkSaveChanges | 250 | 88.50 | 1.61x |
