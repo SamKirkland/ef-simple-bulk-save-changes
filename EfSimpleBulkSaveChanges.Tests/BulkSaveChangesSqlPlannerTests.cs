@@ -46,11 +46,14 @@ public sealed class BulkSaveChangesSqlPlannerTests
 
         AssertSql(
             """
+            WITH source("id", "email", "first_name", "last_name") AS (
+              VALUES (@p0, @p1, @p2, @p3), (@p4, @p5, @p6, @p7)
+            )
             UPDATE "users" AS target SET
               "email" = source."email",
               "first_name" = source."first_name",
               "last_name" = source."last_name"
-            FROM (SELECT @p0 AS "id", @p1 AS "email", @p2 AS "first_name", @p3 AS "last_name" UNION ALL SELECT @p4, @p5, @p6, @p7) AS source
+            FROM source
             WHERE target."id" = source."id";
             """,
             command.CommandText);
@@ -138,9 +141,12 @@ public sealed class BulkSaveChangesSqlPlannerTests
 
         AssertSql(
             """
+            WITH source("id", "status") AS (
+              VALUES (@p0, @p1)
+            )
             UPDATE "converted_users" AS target SET
               "status" = source."status"
-            FROM (SELECT @p0 AS "id", @p1 AS "status") AS source
+            FROM source
             WHERE target."id" = source."id";
             """,
             command.CommandText);
@@ -170,11 +176,14 @@ public sealed class BulkSaveChangesSqlPlannerTests
             plan.Commands[0].CommandText);
         AssertSql(
             """
+            WITH source("id", "email", "first_name", "last_name") AS (
+              VALUES (@p0, @p1, @p2, @p3)
+            )
             UPDATE "users" AS target SET
               "email" = source."email",
               "first_name" = source."first_name",
               "last_name" = source."last_name"
-            FROM (SELECT @p0 AS "id", @p1 AS "email", @p2 AS "first_name", @p3 AS "last_name") AS source
+            FROM source
             WHERE target."id" = source."id";
             """,
             plan.Commands[1].CommandText);

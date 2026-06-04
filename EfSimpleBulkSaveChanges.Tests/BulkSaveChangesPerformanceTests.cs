@@ -9,9 +9,9 @@ namespace EfSimpleBulkSaveChanges.Tests;
 [DoNotParallelize]
 public sealed class BulkSaveChangesPerformanceTests
 {
-    private static readonly int[] RowCounts = [1, 100, 1_000, 10_000];
+    private static readonly int[] RowCounts = [1, 100, 1_000, 10_000, 100_000];
 
-    // SQLite rejects larger UNION ALL update batches with "too many terms in compound SELECT".
+    // Keep SQLite change batches modest so local smoke-test timings stay practical.
     private static readonly int[] LargeChangeBulkBatchSizes = [100, 250];
 
     public TestContext TestContext { get; set; } = null!;
@@ -209,6 +209,11 @@ public sealed class BulkSaveChangesPerformanceTests
         {
             yield return 10_000;
         }
+
+        if (rowCount >= 100_000)
+        {
+            yield return 50_000;
+        }
     }
 
     private static IEnumerable<int> GetChangeBatchSizes(int rowCount)
@@ -222,6 +227,12 @@ public sealed class BulkSaveChangesPerformanceTests
         foreach (var batchSize in LargeChangeBulkBatchSizes)
         {
             yield return batchSize;
+        }
+
+        if (rowCount >= 100_000)
+        {
+            yield return 10_000;
+            yield return 50_000;
         }
     }
 

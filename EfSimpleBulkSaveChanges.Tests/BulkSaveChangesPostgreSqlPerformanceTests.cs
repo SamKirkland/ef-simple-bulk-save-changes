@@ -12,7 +12,7 @@ namespace EfSimpleBulkSaveChanges.Tests;
 [DoNotParallelize]
 public sealed class BulkSaveChangesPostgreSqlPerformanceTests
 {
-    private static readonly int[] RowCounts = [1, 100, 1_000, 10_000];
+    private static readonly int[] RowCounts = [1, 100, 1_000, 10_000, 100_000];
     private static readonly int[] LargeChangeBulkBatchSizes = [100, 250];
     private static PostgreSqlServer? Server;
 
@@ -230,6 +230,11 @@ public sealed class BulkSaveChangesPostgreSqlPerformanceTests
         {
             yield return 10_000;
         }
+
+        if (rowCount >= 100_000)
+        {
+            yield return 50_000;
+        }
     }
 
     private static IEnumerable<int> GetChangeBatchSizes(int rowCount)
@@ -243,6 +248,12 @@ public sealed class BulkSaveChangesPostgreSqlPerformanceTests
         foreach (var batchSize in LargeChangeBulkBatchSizes)
         {
             yield return batchSize;
+        }
+
+        if (rowCount >= 100_000)
+        {
+            yield return 10_000;
+            yield return 50_000;
         }
     }
 

@@ -115,6 +115,38 @@ internal static class BulkSaveChangesSqlPlanner
             var parameters = new List<BulkSaveChangesParameter>();
             var sql = new StringBuilder();
 
+            sql.Append("WITH source(");
+            sql.Append(mapping.KeyColumnIdentifier);
+            foreach (var property in updateProperties)
+            {
+                sql.Append(", ");
+                sql.Append(mapping.GetColumnIdentifier(property));
+            }
+
+            sql.AppendLine(") AS (");
+            sql.Append("  VALUES ");
+
+            for (var rowIndex = 0; rowIndex < batch.Length; rowIndex++)
+            {
+                if (rowIndex > 0)
+                {
+                    sql.Append(", ");
+                }
+
+                sql.Append('(');
+                sql.Append(AddParameter(parameters, batch[rowIndex].Property(mapping.KeyProperty).CurrentValue, mapping.KeyProperty));
+
+                foreach (var property in updateProperties)
+                {
+                    sql.Append(", ");
+                    sql.Append(AddParameter(parameters, batch[rowIndex].Property(property).CurrentValue, property));
+                }
+
+                sql.Append(')');
+            }
+
+            sql.AppendLine();
+            sql.AppendLine(")");
             sql.Append("UPDATE ");
             sql.Append(mapping.TableIdentifier);
             sql.AppendLine(" AS target SET");
@@ -134,36 +166,7 @@ internal static class BulkSaveChangesSqlPlanner
             }
 
             sql.AppendLine();
-            sql.Append("FROM (");
-
-            for (var rowIndex = 0; rowIndex < batch.Length; rowIndex++)
-            {
-                if (rowIndex > 0)
-                {
-                    sql.Append(" UNION ALL ");
-                }
-
-                sql.Append("SELECT ");
-                sql.Append(AddParameter(parameters, batch[rowIndex].Property(mapping.KeyProperty).CurrentValue, mapping.KeyProperty));
-                if (rowIndex == 0)
-                {
-                    sql.Append(" AS ");
-                    sql.Append(mapping.KeyColumnIdentifier);
-                }
-
-                foreach (var property in updateProperties)
-                {
-                    sql.Append(", ");
-                    sql.Append(AddParameter(parameters, batch[rowIndex].Property(property).CurrentValue, property));
-                    if (rowIndex == 0)
-                    {
-                        sql.Append(" AS ");
-                        sql.Append(mapping.GetColumnIdentifier(property));
-                    }
-                }
-            }
-
-            sql.AppendLine(") AS source");
+            sql.AppendLine("FROM source");
             sql.Append("WHERE target.");
             sql.Append(mapping.KeyColumnIdentifier);
             sql.Append(" = source.");

@@ -12,8 +12,9 @@ namespace EfSimpleBulkSaveChanges.Tests;
 [DoNotParallelize]
 public sealed class BulkSaveChangesCockroachDbPerformanceTests
 {
-    private static readonly int[] RowCounts = [1, 100, 1_000, 10_000];
-    private static readonly int[] LargeChangeBulkBatchSizes = [100, 250];
+    private const int MeasurementIterations = 3;
+    private static readonly int[] RowCounts = [1, 100, 1_000, 10_000, 100_000];
+    private static readonly int[] LargeChangeBulkBatchSizes = [100, 250, 1_000, 5_000];
     private static CockroachDbServer? Server;
 
     public TestContext TestContext { get; set; } = null!;
@@ -208,7 +209,7 @@ public sealed class BulkSaveChangesCockroachDbPerformanceTests
     private void WriteHeaders()
     {
         TestContext.WriteLine("Database, Scenario, Method, Rows, BatchSize, SaveElapsedMs, SpeedupVsSaveChanges");
-        TestContext.WriteLine("VERBOSE Database, Scenario, Method, Rows, BatchSize, FixtureMs, ArrangeMs, SaveMs, VerifyMs, TotalMs, ExpectedSaved, ActualSaved");
+        TestContext.WriteLine("VERBOSE Database, Scenario, Method, Rows, BatchSize, Iteration, FixtureMs, ArrangeMs, SaveMs, VerifyMs, TotalMs, ExpectedSaved, ActualSaved");
     }
 
     private static IEnumerable<int> GetInsertBatchSizes(int rowCount)
@@ -230,6 +231,11 @@ public sealed class BulkSaveChangesCockroachDbPerformanceTests
         {
             yield return 10_000;
         }
+
+        if (rowCount >= 100_000)
+        {
+            yield return 50_000;
+        }
     }
 
     private static IEnumerable<int> GetChangeBatchSizes(int rowCount)
@@ -243,6 +249,12 @@ public sealed class BulkSaveChangesCockroachDbPerformanceTests
         foreach (var batchSize in LargeChangeBulkBatchSizes)
         {
             yield return batchSize;
+        }
+
+        if (rowCount >= 100_000)
+        {
+            yield return 10_000;
+            yield return 50_000;
         }
     }
 
@@ -286,36 +298,62 @@ public sealed class BulkSaveChangesCockroachDbPerformanceTests
             throw new UnreachableException();
         }
 
-        var totalStopwatch = Stopwatch.StartNew();
-        var fixtureStopwatch = Stopwatch.StartNew();
-        await using var fixture = await CockroachDbFixture.CreateAsync(Server.ConnectionString);
-        await using var db = fixture.CreateContext();
-        fixtureStopwatch.Stop();
+        var measurements = new List<PerformanceIterationMeasurement>(MeasurementIterations);
+        for (var iteration = 1; iteration <= MeasurementIterations; iteration++)
+        {
+            var totalStopwatch = Stopwatch.StartNew();
+            var fixtureStopwatch = Stopwatch.StartNew();
+            await using var fixture = await CockroachDbFixture.CreateAsync(Server.ConnectionString);
+            await using var db = fixture.CreateContext();
+            fixtureStopwatch.Stop();
 
-        var arrangeStopwatch = Stopwatch.StartNew();
-        var expectedSavedCount = await arrangeAsync(db);
-        arrangeStopwatch.Stop();
+            var arrangeStopwatch = Stopwatch.StartNew();
+            var expectedSavedCount = await arrangeAsync(db);
+            arrangeStopwatch.Stop();
 
-        var saveStopwatch = Stopwatch.StartNew();
-        var savedCount = await saveAsync(db);
-        saveStopwatch.Stop();
+            var saveStopwatch = Stopwatch.StartNew();
+            var savedCount = await saveAsync(db);
+            saveStopwatch.Stop();
 
-        var verifyStopwatch = Stopwatch.StartNew();
-        Assert.AreEqual(expectedSavedCount, savedCount);
-        Assert.AreEqual(rowCount, await db.Users.CountAsync());
-        verifyStopwatch.Stop();
-        totalStopwatch.Stop();
+            var verifyStopwatch = Stopwatch.StartNew();
+            Assert.AreEqual(expectedSavedCount, savedCount);
+            Assert.AreEqual(rowCount, await db.Users.CountAsync());
+            verifyStopwatch.Stop();
+            totalStopwatch.Stop();
+
+            var measurement = new PerformanceIterationMeasurement(
+                fixtureStopwatch.Elapsed.TotalMilliseconds,
+                arrangeStopwatch.Elapsed.TotalMilliseconds,
+                saveStopwatch.Elapsed.TotalMilliseconds,
+                verifyStopwatch.Elapsed.TotalMilliseconds,
+                totalStopwatch.Elapsed.TotalMilliseconds,
+                expectedSavedCount,
+                savedCount);
+            measurements.Add(measurement);
+
+            TestContext.WriteLine(
+                $"VERBOSE CockroachDB, {scenario}, {method}, {rowCount}, {batchSize?.ToString() ?? "n/a"}, {iteration}, {measurement.FixtureMilliseconds:F2}, {measurement.ArrangeMilliseconds:F2}, {measurement.SaveMilliseconds:F2}, {measurement.VerifyMilliseconds:F2}, {measurement.TotalMilliseconds:F2}, {measurement.ExpectedSavedCount}, {measurement.SavedCount}");
+        }
+
+        var medianSaveMilliseconds = GetMedian(measurements.Select(measurement => measurement.SaveMilliseconds));
 
         var speedup = saveChangesElapsed is null
             ? "1x"
-            : $"{saveChangesElapsed.Value / saveStopwatch.Elapsed.TotalMilliseconds:F2}x";
+            : $"{saveChangesElapsed.Value / medianSaveMilliseconds:F2}x";
 
         TestContext.WriteLine(
-            $"CockroachDB, {scenario}, {method}, {rowCount}, {batchSize?.ToString() ?? "n/a"}, {saveStopwatch.Elapsed.TotalMilliseconds:F2}, {speedup}");
-        TestContext.WriteLine(
-            $"VERBOSE CockroachDB, {scenario}, {method}, {rowCount}, {batchSize?.ToString() ?? "n/a"}, {fixtureStopwatch.Elapsed.TotalMilliseconds:F2}, {arrangeStopwatch.Elapsed.TotalMilliseconds:F2}, {saveStopwatch.Elapsed.TotalMilliseconds:F2}, {verifyStopwatch.Elapsed.TotalMilliseconds:F2}, {totalStopwatch.Elapsed.TotalMilliseconds:F2}, {expectedSavedCount}, {savedCount}");
+            $"CockroachDB, {scenario}, {method}, {rowCount}, {batchSize?.ToString() ?? "n/a"}, {medianSaveMilliseconds:F2}, {speedup}");
 
-        return new PerformanceMeasurement(saveStopwatch.Elapsed.TotalMilliseconds);
+        return new PerformanceMeasurement(medianSaveMilliseconds);
+    }
+
+    private static double GetMedian(IEnumerable<double> values)
+    {
+        var sortedValues = values.Order().ToArray();
+        var midpoint = sortedValues.Length / 2;
+        return sortedValues.Length % 2 == 0
+            ? (sortedValues[midpoint - 1] + sortedValues[midpoint]) / 2
+            : sortedValues[midpoint];
     }
 
     private static IReadOnlyList<User> CreateUsers(int count, string prefix)
@@ -568,7 +606,7 @@ public sealed class BulkSaveChangesCockroachDbPerformanceTests
             await using var command = connection.CreateCommand();
             command.CommandText = """
             CREATE TABLE performance_users (
-                id INT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+                id INT PRIMARY KEY DEFAULT unique_rowid(),
                 first_name TEXT NOT NULL,
                 last_name TEXT NOT NULL,
                 email TEXT NULL
@@ -614,9 +652,18 @@ public sealed class BulkSaveChangesCockroachDbPerformanceTests
 
     private sealed record PerformanceMeasurement(double SaveMilliseconds);
 
+    private sealed record PerformanceIterationMeasurement(
+        double FixtureMilliseconds,
+        double ArrangeMilliseconds,
+        double SaveMilliseconds,
+        double VerifyMilliseconds,
+        double TotalMilliseconds,
+        int ExpectedSavedCount,
+        int SavedCount);
+
     private sealed class User
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
 
         public required string FirstName { get; set; }
 

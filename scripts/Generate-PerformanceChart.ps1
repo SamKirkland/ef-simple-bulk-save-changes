@@ -17,6 +17,39 @@ function Parse-Number {
     return [double]::Parse($Value.Replace(",", ""), [System.Globalization.CultureInfo]::InvariantCulture)
 }
 
+function Get-DatabaseColor {
+    param([string]$Database)
+
+    if ($Database -eq "PostgreSQL") {
+        return "#2f855a"
+    }
+
+    if ($Database -eq "CockroachDB") {
+        return "#7c3aed"
+    }
+
+    return "#2374ab"
+}
+
+function Add-PerformanceRowIfPresent {
+    param(
+        [System.Collections.Generic.List[object]]$Rows,
+        [string]$Scenario,
+        [string]$RowsText,
+        [string]$Method,
+        [string]$BatchSize,
+        [string]$Database,
+        [string]$ElapsedMs,
+        [string]$Speedup
+    )
+
+    if ([string]::IsNullOrWhiteSpace($ElapsedMs) -or [string]::IsNullOrWhiteSpace($Speedup)) {
+        return
+    }
+
+    Add-PerformanceRow $Rows $Scenario $RowsText $Method $BatchSize $Database (Parse-Number $ElapsedMs) (Parse-Number $Speedup.TrimEnd("x"))
+}
+
 function Add-PerformanceRow {
     param(
         [System.Collections.Generic.List[object]]$Rows,
@@ -30,17 +63,13 @@ function Add-PerformanceRow {
     )
 
     $rowCount = [int](Parse-Number $RowsText)
-    $showBatchSize = -not [string]::IsNullOrWhiteSpace($BatchSize)
-    if ($showBatchSize) {
-        $batchSizeValue = [int](Parse-Number $BatchSize)
-        $showBatchSize = $batchSizeValue -lt $rowCount
-    }
+    $showBatchSize = -not [string]::IsNullOrWhiteSpace($BatchSize) -and $rowCount -gt 1
 
-    $methodLabel = if (-not $showBatchSize) {
+    $methodLabel = if (-not $showBatchSize -or $Method -eq "SaveChanges") {
         $Method
     }
     else {
-        "$Method (batch $BatchSize)"
+        "batch $BatchSize"
     }
 
     $rowLabel = if ($RowsText -eq "1") { "1 row" } else { "$RowsText rows" }
@@ -91,14 +120,14 @@ foreach ($line in Get-Content -LiteralPath $ReadmePath) {
     $method = $cells[1]
     $batchSize = $cells[2]
     if ($cells.Count -eq 5) {
-        Add-PerformanceRow $rows $scenario $cells[0] $method $batchSize "SQLite" (Parse-Number $cells[3]) (Parse-Number $cells[4].TrimEnd("x"))
+        Add-PerformanceRowIfPresent $rows $scenario $cells[0] $method $batchSize "SQLite" $cells[3] $cells[4]
         continue
     }
 
-    Add-PerformanceRow $rows $scenario $cells[0] $method $batchSize "SQLite" (Parse-Number $cells[3]) (Parse-Number $cells[4].TrimEnd("x"))
-    Add-PerformanceRow $rows $scenario $cells[0] $method $batchSize "PostgreSQL" (Parse-Number $cells[5]) (Parse-Number $cells[6].TrimEnd("x"))
+    Add-PerformanceRowIfPresent $rows $scenario $cells[0] $method $batchSize "SQLite" $cells[3] $cells[4]
+    Add-PerformanceRowIfPresent $rows $scenario $cells[0] $method $batchSize "PostgreSQL" $cells[5] $cells[6]
     if ($cells.Count -eq 9) {
-        Add-PerformanceRow $rows $scenario $cells[0] $method $batchSize "CockroachDB" (Parse-Number $cells[7]) (Parse-Number $cells[8].TrimEnd("x"))
+        Add-PerformanceRowIfPresent $rows $scenario $cells[0] $method $batchSize "CockroachDB" $cells[7] $cells[8]
     }
 }
 
@@ -107,21 +136,25 @@ if ($rows.Count -eq 0) {
 }
 
 $maxSpeedup = [Math]::Ceiling(($rows | Measure-Object -Property Speedup -Maximum).Maximum)
+$tickStep = if ($maxSpeedup -le 8) { 1 } elseif ($maxSpeedup -le 20) { 2 } else { 5 }
+$maxTick = [Math]::Ceiling($maxSpeedup / $tickStep) * $tickStep
 $chartWidth = 1080
-$left = 340
+$left = 176
 $right = 44
-$top = 102
-$rowHeight = 24
-$methodHeaderHeight = 20
-$scenarioHeaderHeight = 30
-$scenarioGap = 24
-$rowGroupHeaderHeight = 34
+$top = 82
+$barHeight = 12
+$barGap = 3
+$barStride = $barHeight + $barGap
+$methodGroupGap = 7
+$scenarioHeaderHeight = 42
+$scenarioGap = 16
+$rowGroupHeaderHeight = 22
 $rowGroupGap = 10
 $axisWidth = $chartWidth - $left - $right
 $groupedRows = $rows | Group-Object Scenario
 $rowGroupCount = ($groupedRows | ForEach-Object { ($_.Group | Group-Object Rows).Count } | Measure-Object -Sum).Sum
 $methodGroupCount = ($groupedRows | ForEach-Object { $_.Group | Group-Object Rows | ForEach-Object { ($_.Group | Group-Object MethodLabel).Count } } | Measure-Object -Sum).Sum
-$chartHeight = $top + ($rows.Count * $rowHeight) + ($methodGroupCount * $methodHeaderHeight) + ($rowGroupCount * ($rowGroupHeaderHeight + $rowGroupGap)) + ($groupedRows.Count * ($scenarioHeaderHeight + $scenarioGap)) + 78
+$chartHeight = $top + ($rows.Count * $barStride) + ($methodGroupCount * $methodGroupGap) + ($rowGroupCount * ($rowGroupHeaderHeight + $rowGroupGap)) + ($groupedRows.Count * ($scenarioHeaderHeight + $scenarioGap)) + 52
 
 $outputDirectory = Split-Path -Parent $OutputPath
 if ($outputDirectory) {
@@ -137,31 +170,22 @@ $svg = New-Object System.Text.StringBuilder
 [void]$svg.AppendLine("    text { font-family: Segoe UI, Arial, sans-serif; fill: #172033; }")
 [void]$svg.AppendLine("    .title { font-size: 22px; font-weight: 700; }")
 [void]$svg.AppendLine("    .subtitle { font-size: 13px; fill: #566174; }")
-[void]$svg.AppendLine("    .scenario { font-size: 15px; font-weight: 700; }")
-[void]$svg.AppendLine("    .row-count { font-size: 13px; font-weight: 700; fill: #394255; }")
+[void]$svg.AppendLine("    .scenario { font-size: 16px; font-weight: 700; }")
+[void]$svg.AppendLine("    .row-count { font-size: 12px; font-weight: 700; fill: #394255; }")
 [void]$svg.AppendLine("    .method-heading { font-size: 12px; font-weight: 700; fill: #394255; }")
-[void]$svg.AppendLine("    .database { font-size: 11px; fill: #697386; }")
 [void]$svg.AppendLine("    .subsection-rule { stroke: #e2e8f0; stroke-width: 1; }")
 [void]$svg.AppendLine("    .axis { stroke: #c9d1dd; stroke-width: 1; }")
 [void]$svg.AppendLine("    .grid { stroke: #edf1f6; stroke-width: 1; }")
 [void]$svg.AppendLine("    .tick { font-size: 11px; fill: #697386; }")
-[void]$svg.AppendLine("    .value { font-size: 12px; font-weight: 600; }")
-[void]$svg.AppendLine("    .value-inside { font-size: 12px; font-weight: 600; fill: #ffffff; }")
+[void]$svg.AppendLine("    .value { font-size: 11px; font-weight: 600; }")
+[void]$svg.AppendLine("    .value-inside { font-size: 11px; font-weight: 600; fill: #ffffff; }")
 [void]$svg.AppendLine("    .legend { font-size: 11px; fill: #566174; }")
 [void]$svg.AppendLine("  </style>")
 [void]$svg.AppendLine("  <text x=""24"" y=""32"" class=""title"">BulkSaveChanges Performance</text>")
-[void]$svg.AppendLine("  <text x=""24"" y=""52"" class=""subtitle"">Speedup is calculated against SaveChanges for the same scenario and row count. Values below 1x are slower.</text>")
-[void]$svg.AppendLine("  <rect x=""24"" y=""70"" width=""12"" height=""12"" rx=""2"" fill=""#2374ab""/>")
-[void]$svg.AppendLine("  <text x=""44"" y=""80"" class=""legend"">SQLite</text>")
-[void]$svg.AppendLine("  <rect x=""104"" y=""70"" width=""12"" height=""12"" rx=""2"" fill=""#2f855a""/>")
-[void]$svg.AppendLine("  <text x=""124"" y=""80"" class=""legend"">PostgreSQL</text>")
-[void]$svg.AppendLine("  <rect x=""214"" y=""70"" width=""12"" height=""12"" rx=""2"" fill=""#7c3aed""/>")
-[void]$svg.AppendLine("  <text x=""234"" y=""80"" class=""legend"">CockroachDB</text>")
-[void]$svg.AppendLine("  <rect x=""336"" y=""70"" width=""12"" height=""12"" rx=""2"" fill=""#d65f5f""/>")
-[void]$svg.AppendLine("  <text x=""356"" y=""80"" class=""legend"">slower than SaveChanges</text>")
+[void]$svg.AppendLine("  <text x=""24"" y=""52"" class=""subtitle"">Speedup is versus SaveChanges for the same scenario and row count. Bar labels show speedup and elapsed milliseconds.</text>")
 
-for ($tick = 0; $tick -le $maxSpeedup; $tick++) {
-    $x = $left + (($tick / $maxSpeedup) * $axisWidth)
+for ($tick = 0; $tick -le $maxTick; $tick += $tickStep) {
+    $x = $left + (($tick / $maxTick) * $axisWidth)
     [void]$svg.AppendLine("  <line x1=""$x"" y1=""$top"" x2=""$x"" y2=""$($chartHeight - 48)"" class=""grid""/>")
     [void]$svg.AppendLine("  <text x=""$x"" y=""$($chartHeight - 24)"" class=""tick"" text-anchor=""middle"">$($tick)x</text>")
 }
@@ -169,39 +193,45 @@ for ($tick = 0; $tick -le $maxSpeedup; $tick++) {
 [void]$svg.AppendLine("  <line x1=""$left"" y1=""$top"" x2=""$left"" y2=""$($chartHeight - 48)"" class=""axis""/>")
 
 $y = $top
+$databaseOrder = @("SQLite", "PostgreSQL", "CockroachDB")
 foreach ($group in $groupedRows) {
-    [void]$svg.AppendLine("  <text x=""24"" y=""$($y + 18)"" class=""scenario"">$(Escape-Xml $group.Name)</text>")
+    $legendX = $chartWidth - $right - 354
+    $legendY = $y + 18
+
+    [void]$svg.AppendLine("  <line x1=""24"" y1=""$($y - 8)"" x2=""$($chartWidth - $right)"" y2=""$($y - 8)"" class=""subsection-rule""/>")
+    [void]$svg.AppendLine("  <text x=""24"" y=""$legendY"" class=""scenario"">$(Escape-Xml $group.Name)</text>")
+    [void]$svg.AppendLine("  <rect x=""$legendX"" y=""$($legendY - 10)"" width=""10"" height=""10"" rx=""2"" fill=""$(Get-DatabaseColor "SQLite")""/>")
+    [void]$svg.AppendLine("  <text x=""$($legendX + 16)"" y=""$legendY"" class=""legend"">SQLite</text>")
+    [void]$svg.AppendLine("  <rect x=""$($legendX + 86)"" y=""$($legendY - 10)"" width=""10"" height=""10"" rx=""2"" fill=""$(Get-DatabaseColor "PostgreSQL")""/>")
+    [void]$svg.AppendLine("  <text x=""$($legendX + 102)"" y=""$legendY"" class=""legend"">PostgreSQL</text>")
+    [void]$svg.AppendLine("  <rect x=""$($legendX + 208)"" y=""$($legendY - 10)"" width=""10"" height=""10"" rx=""2"" fill=""$(Get-DatabaseColor "CockroachDB")""/>")
+    [void]$svg.AppendLine("  <text x=""$($legendX + 224)"" y=""$legendY"" class=""legend"">CockroachDB</text>")
     $y += $scenarioHeaderHeight
 
     foreach ($rowGroup in ($group.Group | Group-Object Rows)) {
         $rowCount = Escape-Xml $rowGroup.Name
-        $ruleY = $y + 10
+        $ruleY = $y + 8
 
-        [void]$svg.AppendLine("  <text x=""44"" y=""$($y + 16)"" class=""row-count"">$rowCount</text>")
-        [void]$svg.AppendLine("  <line x1=""142"" y1=""$ruleY"" x2=""$($chartWidth - $right)"" y2=""$ruleY"" class=""subsection-rule""/>")
+        [void]$svg.AppendLine("  <text x=""24"" y=""$($y + 13)"" class=""row-count"">$rowCount</text>")
+        [void]$svg.AppendLine("  <line x1=""104"" y1=""$ruleY"" x2=""$($chartWidth - $right)"" y2=""$ruleY"" class=""subsection-rule""/>")
         $y += $rowGroupHeaderHeight
 
         foreach ($methodGroup in ($rowGroup.Group | Group-Object MethodLabel)) {
             $methodLabel = Escape-Xml $methodGroup.Name
-            [void]$svg.AppendLine("  <text x=""72"" y=""$y"" class=""method-heading"">$methodLabel</text>")
-            $y += $methodHeaderHeight
+            $barCount = $methodGroup.Group.Count
+            $labelY = $y + (($barCount * $barStride - $barGap) / 2) + 4
+            [void]$svg.AppendLine("  <text x=""166"" y=""$labelY"" class=""method-heading"" text-anchor=""end"">$methodLabel</text>")
 
-            foreach ($row in $methodGroup.Group) {
-                $barWidth = [Math]::Max(1, ($row.Speedup / $maxSpeedup) * $axisWidth)
-                $barColor = if ($row.Speedup -lt 1) {
-                    "#d65f5f"
+            foreach ($database in $databaseOrder) {
+                $row = $methodGroup.Group | Where-Object { $_.Database -eq $database } | Select-Object -First 1
+                if (-not $row) {
+                    continue
                 }
-                elseif ($row.Database -eq "PostgreSQL") {
-                    "#2f855a"
-                }
-                elseif ($row.Database -eq "CockroachDB") {
-                    "#7c3aed"
-                }
-                else {
-                    "#2374ab"
-                }
-                $barY = $y - 14
-                $database = Escape-Xml $row.Database
+
+                $barWidth = [Math]::Max(1, ($row.Speedup / $maxTick) * $axisWidth)
+                $barColor = Get-DatabaseColor $row.Database
+                $barY = $y
+                $valueY = $y + 10
                 $value = Escape-Xml ("{0:N2}x ({1:N2} ms)" -f $row.Speedup, $row.ElapsedMs)
                 $valueX = $left + $barWidth + 8
                 $valueClass = "value"
@@ -212,17 +242,18 @@ foreach ($group in $groupedRows) {
                     $valueAnchor = "end"
                 }
 
-                [void]$svg.AppendLine("  <text x=""116"" y=""$y"" class=""database"">$database</text>")
-                [void]$svg.AppendLine("  <rect x=""$left"" y=""$barY"" width=""$barWidth"" height=""14"" rx=""3"" fill=""$barColor""/>")
-                [void]$svg.AppendLine("  <text x=""$valueX"" y=""$y"" class=""$valueClass"" text-anchor=""$valueAnchor"">$value</text>")
-                $y += $rowHeight
+                [void]$svg.AppendLine("  <rect x=""$left"" y=""$barY"" width=""$barWidth"" height=""$barHeight"" rx=""2"" fill=""$barColor""/>")
+                [void]$svg.AppendLine("  <text x=""$valueX"" y=""$valueY"" class=""$valueClass"" text-anchor=""$valueAnchor"">$value</text>")
+                $y += $barStride
             }
+
+            $y += $methodGroupGap
         }
 
         $y += $rowGroupGap
     }
 
-    $y += $scenarioGap - 4
+    $y += $scenarioGap
 }
 
 [void]$svg.AppendLine("</svg>")
