@@ -164,7 +164,7 @@ if ($outputDirectory) {
 $svg = New-Object System.Text.StringBuilder
 [void]$svg.AppendLine("<svg xmlns=""http://www.w3.org/2000/svg"" width=""$chartWidth"" height=""$chartHeight"" viewBox=""0 0 $chartWidth $chartHeight"" role=""img"" aria-labelledby=""title desc"">")
 [void]$svg.AppendLine("  <title id=""title"">BulkSaveChanges performance results</title>")
-[void]$svg.AppendLine("  <desc id=""desc"">Horizontal bar chart showing speedup versus SaveChanges for save and synchronize scenarios.</desc>")
+[void]$svg.AppendLine("  <desc id=""desc"">Horizontal bar chart showing speedup versus SaveChanges for bulk save scenarios.</desc>")
 [void]$svg.AppendLine("  <rect width=""100%"" height=""100%"" fill=""#ffffff""/>")
 [void]$svg.AppendLine("  <style>")
 [void]$svg.AppendLine("    text { font-family: Segoe UI, Arial, sans-serif; fill: #172033; }")

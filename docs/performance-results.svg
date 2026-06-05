@@ -1,6 +1,6 @@
-﻿<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="3274" viewBox="0 0 1080 3274" role="img" aria-labelledby="title desc">
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="2480" viewBox="0 0 1080 2480" role="img" aria-labelledby="title desc">
   <title id="title">BulkSaveChanges performance results</title>
-  <desc id="desc">Horizontal bar chart showing speedup versus SaveChanges for save and synchronize scenarios.</desc>
+  <desc id="desc">Horizontal bar chart showing speedup versus SaveChanges for bulk save scenarios.</desc>
   <rect width="100%" height="100%" fill="#ffffff"/>
   <style>
     text { font-family: Segoe UI, Arial, sans-serif; fill: #172033; }
@@ -19,27 +19,27 @@
   </style>
   <text x="24" y="32" class="title">BulkSaveChanges Performance</text>
   <text x="24" y="52" class="subtitle">Speedup is versus SaveChanges for the same scenario and row count. Bar labels show speedup and elapsed milliseconds.</text>
-  <line x1="176" y1="82" x2="176" y2="3226" class="grid"/>
-  <text x="176" y="3250" class="tick" text-anchor="middle">0x</text>
-  <line x1="271.555555555556" y1="82" x2="271.555555555556" y2="3226" class="grid"/>
-  <text x="271.555555555556" y="3250" class="tick" text-anchor="middle">2x</text>
-  <line x1="367.111111111111" y1="82" x2="367.111111111111" y2="3226" class="grid"/>
-  <text x="367.111111111111" y="3250" class="tick" text-anchor="middle">4x</text>
-  <line x1="462.666666666667" y1="82" x2="462.666666666667" y2="3226" class="grid"/>
-  <text x="462.666666666667" y="3250" class="tick" text-anchor="middle">6x</text>
-  <line x1="558.222222222222" y1="82" x2="558.222222222222" y2="3226" class="grid"/>
-  <text x="558.222222222222" y="3250" class="tick" text-anchor="middle">8x</text>
-  <line x1="653.777777777778" y1="82" x2="653.777777777778" y2="3226" class="grid"/>
-  <text x="653.777777777778" y="3250" class="tick" text-anchor="middle">10x</text>
-  <line x1="749.333333333333" y1="82" x2="749.333333333333" y2="3226" class="grid"/>
-  <text x="749.333333333333" y="3250" class="tick" text-anchor="middle">12x</text>
-  <line x1="844.888888888889" y1="82" x2="844.888888888889" y2="3226" class="grid"/>
-  <text x="844.888888888889" y="3250" class="tick" text-anchor="middle">14x</text>
-  <line x1="940.444444444444" y1="82" x2="940.444444444444" y2="3226" class="grid"/>
-  <text x="940.444444444444" y="3250" class="tick" text-anchor="middle">16x</text>
-  <line x1="1036" y1="82" x2="1036" y2="3226" class="grid"/>
-  <text x="1036" y="3250" class="tick" text-anchor="middle">18x</text>
-  <line x1="176" y1="82" x2="176" y2="3226" class="axis"/>
+  <line x1="176" y1="82" x2="176" y2="2432" class="grid"/>
+  <text x="176" y="2456" class="tick" text-anchor="middle">0x</text>
+  <line x1="271.555555555556" y1="82" x2="271.555555555556" y2="2432" class="grid"/>
+  <text x="271.555555555556" y="2456" class="tick" text-anchor="middle">2x</text>
+  <line x1="367.111111111111" y1="82" x2="367.111111111111" y2="2432" class="grid"/>
+  <text x="367.111111111111" y="2456" class="tick" text-anchor="middle">4x</text>
+  <line x1="462.666666666667" y1="82" x2="462.666666666667" y2="2432" class="grid"/>
+  <text x="462.666666666667" y="2456" class="tick" text-anchor="middle">6x</text>
+  <line x1="558.222222222222" y1="82" x2="558.222222222222" y2="2432" class="grid"/>
+  <text x="558.222222222222" y="2456" class="tick" text-anchor="middle">8x</text>
+  <line x1="653.777777777778" y1="82" x2="653.777777777778" y2="2432" class="grid"/>
+  <text x="653.777777777778" y="2456" class="tick" text-anchor="middle">10x</text>
+  <line x1="749.333333333333" y1="82" x2="749.333333333333" y2="2432" class="grid"/>
+  <text x="749.333333333333" y="2456" class="tick" text-anchor="middle">12x</text>
+  <line x1="844.888888888889" y1="82" x2="844.888888888889" y2="2432" class="grid"/>
+  <text x="844.888888888889" y="2456" class="tick" text-anchor="middle">14x</text>
+  <line x1="940.444444444444" y1="82" x2="940.444444444444" y2="2432" class="grid"/>
+  <text x="940.444444444444" y="2456" class="tick" text-anchor="middle">16x</text>
+  <line x1="1036" y1="82" x2="1036" y2="2432" class="grid"/>
+  <text x="1036" y="2456" class="tick" text-anchor="middle">18x</text>
+  <line x1="176" y1="82" x2="176" y2="2432" class="axis"/>
   <line x1="24" y1="74" x2="1036" y2="74" class="subsection-rule"/>
   <text x="24" y="100" class="scenario">Insert</text>
   <rect x="682" y="90" width="10" height="10" rx="2" fill="#2374ab"/>
@@ -329,103 +329,5 @@
   <text x="166" y="2390" class="method-heading" text-anchor="end">batch 5,000</text>
   <rect x="176" y="2380" width="769" height="12" rx="2" fill="#7c3aed"/>
   <text x="937" y="2390" class="value-inside" text-anchor="end">16.09x (125.13 ms)</text>
-  <line x1="24" y1="2420" x2="1036" y2="2420" class="subsection-rule"/>
-  <text x="24" y="2446" class="scenario">Synchronize</text>
-  <rect x="682" y="2436" width="10" height="10" rx="2" fill="#2374ab"/>
-  <text x="698" y="2446" class="legend">SQLite</text>
-  <rect x="768" y="2436" width="10" height="10" rx="2" fill="#2f855a"/>
-  <text x="784" y="2446" class="legend">PostgreSQL</text>
-  <rect x="890" y="2436" width="10" height="10" rx="2" fill="#7c3aed"/>
-  <text x="906" y="2446" class="legend">CockroachDB</text>
-  <text x="24" y="2483" class="row-count">1 row</text>
-  <line x1="104" y1="2478" x2="1036" y2="2478" class="subsection-rule"/>
-  <text x="166" y="2517" class="method-heading" text-anchor="end">SaveChanges</text>
-  <rect x="176" y="2492" width="48" height="12" rx="2" fill="#2374ab"/>
-  <text x="232" y="2502" class="value" text-anchor="start">1.00x (1.81 ms)</text>
-  <rect x="176" y="2507" width="48" height="12" rx="2" fill="#2f855a"/>
-  <text x="232" y="2517" class="value" text-anchor="start">1.00x (2.33 ms)</text>
-  <rect x="176" y="2522" width="48" height="12" rx="2" fill="#7c3aed"/>
-  <text x="232" y="2532" class="value" text-anchor="start">1.00x (3.01 ms)</text>
-  <text x="166" y="2569" class="method-heading" text-anchor="end">BulkSynchronize</text>
-  <rect x="176" y="2544" width="19" height="12" rx="2" fill="#2374ab"/>
-  <text x="203" y="2554" class="value" text-anchor="start">0.40x (4.57 ms)</text>
-  <rect x="176" y="2559" width="18" height="12" rx="2" fill="#2f855a"/>
-  <text x="202" y="2569" class="value" text-anchor="start">0.38x (6.14 ms)</text>
-  <rect x="176" y="2574" width="21" height="12" rx="2" fill="#7c3aed"/>
-  <text x="205" y="2584" class="value" text-anchor="start">0.43x (7.05 ms)</text>
-  <text x="24" y="2619" class="row-count">100 rows</text>
-  <line x1="104" y1="2614" x2="1036" y2="2614" class="subsection-rule"/>
-  <text x="166" y="2653" class="method-heading" text-anchor="end">SaveChanges</text>
-  <rect x="176" y="2628" width="48" height="12" rx="2" fill="#2374ab"/>
-  <text x="232" y="2638" class="value" text-anchor="start">1.00x (1.68 ms)</text>
-  <rect x="176" y="2643" width="48" height="12" rx="2" fill="#2f855a"/>
-  <text x="232" y="2653" class="value" text-anchor="start">1.00x (9.69 ms)</text>
-  <rect x="176" y="2658" width="48" height="12" rx="2" fill="#7c3aed"/>
-  <text x="232" y="2668" class="value" text-anchor="start">1.00x (35.95 ms)</text>
-  <text x="166" y="2705" class="method-heading" text-anchor="end">batch 100</text>
-  <rect x="176" y="2680" width="28" height="12" rx="2" fill="#2374ab"/>
-  <text x="212" y="2690" class="value" text-anchor="start">0.58x (2.88 ms)</text>
-  <rect x="176" y="2695" width="72" height="12" rx="2" fill="#2f855a"/>
-  <text x="256" y="2705" class="value" text-anchor="start">1.50x (6.45 ms)</text>
-  <rect x="176" y="2710" width="146" height="12" rx="2" fill="#7c3aed"/>
-  <text x="330" y="2720" class="value" text-anchor="start">3.06x (11.74 ms)</text>
-  <text x="24" y="2755" class="row-count">1,000 rows</text>
-  <line x1="104" y1="2750" x2="1036" y2="2750" class="subsection-rule"/>
-  <text x="166" y="2789" class="method-heading" text-anchor="end">SaveChanges</text>
-  <rect x="176" y="2764" width="48" height="12" rx="2" fill="#2374ab"/>
-  <text x="232" y="2774" class="value" text-anchor="start">1.00x (28.58 ms)</text>
-  <rect x="176" y="2779" width="48" height="12" rx="2" fill="#2f855a"/>
-  <text x="232" y="2789" class="value" text-anchor="start">1.00x (43.89 ms)</text>
-  <rect x="176" y="2794" width="48" height="12" rx="2" fill="#7c3aed"/>
-  <text x="232" y="2804" class="value" text-anchor="start">1.00x (310.18 ms)</text>
-  <text x="166" y="2841" class="method-heading" text-anchor="end">batch 100</text>
-  <rect x="176" y="2816" width="66" height="12" rx="2" fill="#2374ab"/>
-  <text x="250" y="2826" class="value" text-anchor="start">1.38x (20.76 ms)</text>
-  <rect x="176" y="2831" width="67" height="12" rx="2" fill="#2f855a"/>
-  <text x="251" y="2841" class="value" text-anchor="start">1.40x (31.38 ms)</text>
-  <rect x="176" y="2846" width="266" height="12" rx="2" fill="#7c3aed"/>
-  <text x="450" y="2856" class="value" text-anchor="start">5.56x (55.82 ms)</text>
-  <text x="166" y="2893" class="method-heading" text-anchor="end">batch 250</text>
-  <rect x="176" y="2868" width="75" height="12" rx="2" fill="#2374ab"/>
-  <text x="259" y="2878" class="value" text-anchor="start">1.56x (18.27 ms)</text>
-  <rect x="176" y="2883" width="123" height="12" rx="2" fill="#2f855a"/>
-  <text x="307" y="2893" class="value" text-anchor="start">2.57x (17.11 ms)</text>
-  <rect x="176" y="2898" width="349" height="12" rx="2" fill="#7c3aed"/>
-  <text x="533" y="2908" class="value" text-anchor="start">7.31x (42.42 ms)</text>
-  <text x="166" y="2930" class="method-heading" text-anchor="end">batch 1,000</text>
-  <rect x="176" y="2920" width="426" height="12" rx="2" fill="#7c3aed"/>
-  <text x="610" y="2930" class="value" text-anchor="start">8.91x (34.80 ms)</text>
-  <text x="166" y="2952" class="method-heading" text-anchor="end">batch 5,000</text>
-  <rect x="176" y="2942" width="395" height="12" rx="2" fill="#7c3aed"/>
-  <text x="579" y="2952" class="value" text-anchor="start">8.27x (37.50 ms)</text>
-  <text x="24" y="2987" class="row-count">10,000 rows</text>
-  <line x1="104" y1="2982" x2="1036" y2="2982" class="subsection-rule"/>
-  <text x="166" y="3021" class="method-heading" text-anchor="end">SaveChanges</text>
-  <rect x="176" y="2996" width="48" height="12" rx="2" fill="#2374ab"/>
-  <text x="232" y="3006" class="value" text-anchor="start">1.00x (228.00 ms)</text>
-  <rect x="176" y="3011" width="48" height="12" rx="2" fill="#2f855a"/>
-  <text x="232" y="3021" class="value" text-anchor="start">1.00x (414.70 ms)</text>
-  <rect x="176" y="3026" width="48" height="12" rx="2" fill="#7c3aed"/>
-  <text x="232" y="3036" class="value" text-anchor="start">1.00x (3,125.55 ms)</text>
-  <text x="166" y="3073" class="method-heading" text-anchor="end">batch 100</text>
-  <rect x="176" y="3048" width="54" height="12" rx="2" fill="#2374ab"/>
-  <text x="238" y="3058" class="value" text-anchor="start">1.13x (201.70 ms)</text>
-  <rect x="176" y="3063" width="63" height="12" rx="2" fill="#2f855a"/>
-  <text x="247" y="3073" class="value" text-anchor="start">1.31x (316.80 ms)</text>
-  <rect x="176" y="3078" width="284" height="12" rx="2" fill="#7c3aed"/>
-  <text x="468" y="3088" class="value" text-anchor="start">5.94x (526.13 ms)</text>
-  <text x="166" y="3125" class="method-heading" text-anchor="end">batch 250</text>
-  <rect x="176" y="3100" width="52" height="12" rx="2" fill="#2374ab"/>
-  <text x="236" y="3110" class="value" text-anchor="start">1.09x (208.41 ms)</text>
-  <rect x="176" y="3115" width="90" height="12" rx="2" fill="#2f855a"/>
-  <text x="274" y="3125" class="value" text-anchor="start">1.89x (219.20 ms)</text>
-  <rect x="176" y="3130" width="376" height="12" rx="2" fill="#7c3aed"/>
-  <text x="560" y="3140" class="value" text-anchor="start">7.87x (397.32 ms)</text>
-  <text x="166" y="3162" class="method-heading" text-anchor="end">batch 1,000</text>
-  <rect x="176" y="3152" width="531" height="12" rx="2" fill="#7c3aed"/>
-  <text x="715" y="3162" class="value" text-anchor="start">11.12x (281.17 ms)</text>
-  <text x="166" y="3184" class="method-heading" text-anchor="end">batch 5,000</text>
-  <rect x="176" y="3174" width="548" height="12" rx="2" fill="#7c3aed"/>
-  <text x="732" y="3184" class="value" text-anchor="start">11.47x (272.56 ms)</text>
 </svg>
 

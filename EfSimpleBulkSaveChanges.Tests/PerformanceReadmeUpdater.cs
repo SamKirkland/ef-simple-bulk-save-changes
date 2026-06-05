@@ -10,8 +10,7 @@ internal static class PerformanceReadmeUpdater
     {
         ["insert"] = "Insert",
         ["update"] = "Update",
-        ["mixed"] = "Mixed Add/Update/Delete",
-        ["synchronize"] = "Synchronize"
+        ["mixed"] = "Mixed Add/Update/Delete"
     };
 
     private static readonly Dictionary<string, (int Elapsed, int Speedup)> DatabaseColumns = new(StringComparer.OrdinalIgnoreCase)
@@ -104,11 +103,8 @@ internal static class PerformanceReadmeUpdater
         var updateBulk = GetPerformanceCell(lines, "update", "BulkSaveChanges", 10_000, 5_000, "CockroachDB").Elapsed;
         var mixedSaveChanges = GetPerformanceCell(lines, "mixed", "SaveChanges", 10_000, null, "CockroachDB").Elapsed;
         var mixedBulk = GetPerformanceCell(lines, "mixed", "BulkSaveChanges", 10_000, 5_000, "CockroachDB").Elapsed;
-        var synchronizeSaveChanges = GetPerformanceCell(lines, "synchronize", "SaveChanges", 10_000, null, "CockroachDB").Elapsed;
-        var synchronizeBulk = GetPerformanceCell(lines, "synchronize", "BulkSynchronize", 10_000, 5_000, "CockroachDB").Elapsed;
-
         lines[summaryIndex + 2] =
-            $"The CockroachDB-focused update change replaces `UNION ALL` update sources with a `VALUES` CTE, and the CockroachDB performance schema now matches a production-friendly `DEFAULT unique_rowid()` key shape. With a single-node CockroachDB cluster, larger batches reduce round trips substantially across inserts, updates, mixed changes, and synchronization. At 10,000 rows, bulk inserts with batch 10,000 completed in a median {insertBulk} ms versus {insertSaveChanges} ms for `SaveChanges`; 10,000-row updates reached {updateBulk} ms at batch 5,000 versus {updateSaveChanges} ms; mixed changes reached {mixedBulk} ms at batch 5,000 versus {mixedSaveChanges} ms; and synchronize reached {synchronizeBulk} ms at batch 5,000 versus {synchronizeSaveChanges} ms.";
+            $"The CockroachDB-focused update change replaces `UNION ALL` update sources with a `VALUES` CTE, and the CockroachDB performance schema now matches a production-friendly `DEFAULT unique_rowid()` key shape. With a single-node CockroachDB cluster, larger batches reduce round trips substantially across inserts, updates, and mixed changes. At 10,000 rows, bulk inserts with batch 10,000 completed in a median {insertBulk} ms versus {insertSaveChanges} ms for `SaveChanges`; 10,000-row updates reached {updateBulk} ms at batch 5,000 versus {updateSaveChanges} ms; and mixed changes reached {mixedBulk} ms at batch 5,000 versus {mixedSaveChanges} ms.";
     }
 
     private static (string Elapsed, string Speedup) GetPerformanceCell(
