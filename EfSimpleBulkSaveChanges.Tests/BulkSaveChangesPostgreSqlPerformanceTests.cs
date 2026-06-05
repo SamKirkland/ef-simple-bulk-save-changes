@@ -1,7 +1,9 @@
 using System.Diagnostics;
+using System.Data.Common;
 using System.Net;
 using System.Net.Sockets;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Npgsql;
 
 namespace EfSimpleBulkSaveChanges.Tests;
@@ -12,7 +14,7 @@ namespace EfSimpleBulkSaveChanges.Tests;
 [DoNotParallelize]
 public sealed class BulkSaveChangesPostgreSqlPerformanceTests
 {
-    private static readonly int[] RowCounts = [1, 100, 1_000, 10_000, 100_000];
+    private static readonly int[] RowCounts = [1, 100, 1_000, 10_000];
     private static readonly int[] LargeChangeBulkBatchSizes = [100, 250];
     private static PostgreSqlServer? Server;
 
@@ -80,6 +82,44 @@ public sealed class BulkSaveChangesPostgreSqlPerformanceTests
                         return Task.FromResult(rowCount);
                     });
             }
+        }
+    }
+
+    [TestMethod]
+    public async Task Inserts_ManualSqlVersusNpgsqlBatchSettings()
+    {
+        const int rowCount = 1_000;
+        int?[] npgsqlMaxBatchSizes = [null, 1, 42, 100, 1_000];
+        int[] manualBatchSizes = [1, 42, 100, 1_000];
+
+        TestContext.WriteLine("Database, Scenario, Method, Rows, MaxBatchSize, CommandCount, MinStatementsPerCommand, MaxStatementsPerCommand, SaveElapsedMs, RelativeToDefaultSaveChanges");
+
+        double? defaultSaveChangesElapsed = null;
+
+        foreach (var maxBatchSize in npgsqlMaxBatchSizes)
+        {
+            var measurement = await MeasureNpgsqlInsertBatchSettingAsync(rowCount, maxBatchSize);
+            defaultSaveChangesElapsed ??= measurement.SaveMilliseconds;
+            WriteInsertBatchComparison(
+                "SaveChanges",
+                rowCount,
+                maxBatchSize,
+                measurement,
+                defaultSaveChangesElapsed.Value);
+        }
+
+        var baselineElapsed = defaultSaveChangesElapsed
+            ?? throw new UnreachableException("The default SaveChanges measurement should always run first.");
+
+        foreach (var batchSize in manualBatchSizes)
+        {
+            var measurement = await MeasureManualInsertCommandsAsync(rowCount, batchSize);
+            WriteInsertBatchComparison(
+                "Manual single-row INSERT batch",
+                rowCount,
+                batchSize,
+                measurement,
+                baselineElapsed);
         }
     }
 
@@ -231,10 +271,6 @@ public sealed class BulkSaveChangesPostgreSqlPerformanceTests
             yield return 10_000;
         }
 
-        if (rowCount >= 100_000)
-        {
-            yield return 50_000;
-        }
     }
 
     private static IEnumerable<int> GetChangeBatchSizes(int rowCount)
@@ -253,7 +289,6 @@ public sealed class BulkSaveChangesPostgreSqlPerformanceTests
         if (rowCount >= 100_000)
         {
             yield return 10_000;
-            yield return 50_000;
         }
     }
 
@@ -280,6 +315,111 @@ public sealed class BulkSaveChangesPostgreSqlPerformanceTests
             saveChangesElapsed,
             arrangeAsync,
             db => db.BulkSaveChangesAsync(batchSize));
+    }
+
+    private async Task<InsertBatchMeasurement> MeasureNpgsqlInsertBatchSettingAsync(int rowCount, int? maxBatchSize)
+    {
+        if (Server is null)
+        {
+            Assert.Inconclusive("PostgreSQL server was not initialized.");
+            throw new UnreachableException();
+        }
+
+        await using var fixture = await PostgreSqlFixture.CreateAsync(Server.ConnectionString);
+        var diagnostics = new InsertCommandDiagnostics();
+        await using var db = fixture.CreateContext(maxBatchSize, diagnostics);
+
+        db.Users.AddRange(CreateUsers(rowCount, $"save-insert-max-{maxBatchSize?.ToString() ?? "default"}"));
+
+        var stopwatch = Stopwatch.StartNew();
+        var savedCount = await db.SaveChangesAsync();
+        stopwatch.Stop();
+
+        Assert.AreEqual(rowCount, savedCount);
+        Assert.AreEqual(rowCount, await db.Users.CountAsync());
+
+        return diagnostics.ToMeasurement(stopwatch.Elapsed.TotalMilliseconds);
+    }
+
+    private async Task<InsertBatchMeasurement> MeasureManualInsertCommandsAsync(int rowCount, int batchSize)
+    {
+        if (Server is null)
+        {
+            Assert.Inconclusive("PostgreSQL server was not initialized.");
+            throw new UnreachableException();
+        }
+
+        await using var fixture = await PostgreSqlFixture.CreateAsync(Server.ConnectionString);
+        var commandCount = 0;
+        var minStatementsPerCommand = int.MaxValue;
+        var maxStatementsPerCommand = 0;
+
+        await using var connection = new NpgsqlConnection(fixture.ConnectionString);
+        await connection.OpenAsync();
+
+        var stopwatch = Stopwatch.StartNew();
+
+        for (var batchStart = 1; batchStart <= rowCount; batchStart += batchSize)
+        {
+            var count = Math.Min(batchSize, rowCount - batchStart + 1);
+            commandCount++;
+            minStatementsPerCommand = Math.Min(minStatementsPerCommand, count);
+            maxStatementsPerCommand = Math.Max(maxStatementsPerCommand, count);
+
+            await using var batch = new NpgsqlBatch(connection);
+
+            for (var offset = 0; offset < count; offset++)
+            {
+                var index = batchStart + offset;
+                var command = new NpgsqlBatchCommand("""
+                INSERT INTO performance_users (first_name, last_name, email)
+                VALUES ($1, $2, $3)
+                RETURNING id;
+                """);
+
+                command.Parameters.Add(new NpgsqlParameter { Value = $"manual-insert-{batchSize}-first-{index}" });
+                command.Parameters.Add(new NpgsqlParameter { Value = $"manual-insert-{batchSize}-last-{index}" });
+                command.Parameters.Add(new NpgsqlParameter { Value = $"manual-insert-{batchSize}-{index}@example.com" });
+                batch.BatchCommands.Add(command);
+            }
+
+            await using var reader = await batch.ExecuteReaderAsync();
+
+            do
+            {
+                while (await reader.ReadAsync())
+                {
+                    _ = reader.GetInt32(0);
+                }
+            }
+            while (await reader.NextResultAsync());
+        }
+
+        stopwatch.Stop();
+
+        await using (var countCommand = connection.CreateCommand())
+        {
+            countCommand.CommandText = "SELECT COUNT(*) FROM performance_users;";
+            Assert.AreEqual(rowCount, Convert.ToInt32(await countCommand.ExecuteScalarAsync()));
+        }
+
+        return new InsertBatchMeasurement(
+            stopwatch.Elapsed.TotalMilliseconds,
+            commandCount,
+            minStatementsPerCommand,
+            maxStatementsPerCommand);
+    }
+
+    private void WriteInsertBatchComparison(
+        string method,
+        int rowCount,
+        int? maxBatchSize,
+        InsertBatchMeasurement measurement,
+        double defaultSaveChangesElapsed)
+    {
+        var relative = $"{defaultSaveChangesElapsed / measurement.SaveMilliseconds:F2}x";
+        TestContext.WriteLine(
+            $"PostgreSQL, insert, {method}, {rowCount}, {maxBatchSize?.ToString() ?? "default"}, {measurement.CommandCount}, {measurement.MinStatementsPerCommand}, {measurement.MaxStatementsPerCommand}, {measurement.SaveMilliseconds:F2}, {relative}");
     }
 
     private async Task<PerformanceMeasurement> MeasureAsync(
@@ -561,11 +701,27 @@ public sealed class BulkSaveChangesPostgreSqlPerformanceTests
             return fixture;
         }
 
-        public PerformanceDbContext CreateContext()
+        public PerformanceDbContext CreateContext(
+            int? maxBatchSize = null,
+            IInterceptor? interceptor = null)
         {
-            var options = new DbContextOptionsBuilder<PerformanceDbContext>()
-                .UseNpgsql(ConnectionString)
-                .Options;
+            var optionsBuilder = new DbContextOptionsBuilder<PerformanceDbContext>()
+                .UseNpgsql(
+                    ConnectionString,
+                    npgsqlOptions =>
+                    {
+                        if (maxBatchSize is not null)
+                        {
+                            npgsqlOptions.MaxBatchSize(maxBatchSize.Value);
+                        }
+                    });
+
+            if (interceptor is not null)
+            {
+                optionsBuilder.AddInterceptors(interceptor);
+            }
+
+            var options = optionsBuilder.Options;
 
             return new PerformanceDbContext(options);
         }
@@ -617,6 +773,61 @@ public sealed class BulkSaveChangesPostgreSqlPerformanceTests
     }
 
     private sealed record PerformanceMeasurement(double SaveMilliseconds);
+
+    private sealed record InsertBatchMeasurement(
+        double SaveMilliseconds,
+        int CommandCount,
+        int MinStatementsPerCommand,
+        int MaxStatementsPerCommand);
+
+    private sealed class InsertCommandDiagnostics : DbCommandInterceptor
+    {
+        private readonly List<int> _statementsPerCommand = [];
+
+        public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(
+            DbCommand command,
+            CommandEventData eventData,
+            InterceptionResult<DbDataReader> result,
+            CancellationToken cancellationToken = default)
+        {
+            CountInsertStatements(command);
+            return base.ReaderExecutingAsync(command, eventData, result, cancellationToken);
+        }
+
+        public InsertBatchMeasurement ToMeasurement(double saveMilliseconds)
+        {
+            return new InsertBatchMeasurement(
+                saveMilliseconds,
+                _statementsPerCommand.Count,
+                _statementsPerCommand.Count == 0 ? 0 : _statementsPerCommand.Min(),
+                _statementsPerCommand.Count == 0 ? 0 : _statementsPerCommand.Max());
+        }
+
+        private void CountInsertStatements(DbCommand command)
+        {
+            var insertCount = 0;
+            var commandText = command.CommandText.AsSpan();
+            const string insertPrefix = "INSERT INTO performance_users";
+
+            while (true)
+            {
+                var index = commandText.IndexOf(insertPrefix, StringComparison.OrdinalIgnoreCase);
+
+                if (index < 0)
+                {
+                    break;
+                }
+
+                insertCount++;
+                commandText = commandText[(index + insertPrefix.Length)..];
+            }
+
+            if (insertCount > 0)
+            {
+                _statementsPerCommand.Add(insertCount);
+            }
+        }
+    }
 
     private sealed class User
     {

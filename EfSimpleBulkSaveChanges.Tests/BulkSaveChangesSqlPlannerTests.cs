@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ValueGeneration;
+using Microsoft.Extensions.Logging;
 
 namespace EfSimpleBulkSaveChanges.Tests;
 
@@ -102,6 +105,97 @@ public sealed class BulkSaveChangesSqlPlannerTests
             command.CommandText);
         CollectionAssert.AreEqual(new object?[] { 100, "John" }, command.Parameters.Select(parameter => parameter.Value).ToArray());
         Assert.AreEqual(0, command.GeneratedValueAssignments.Count);
+    }
+
+    [TestMethod]
+    public async Task BulkSaveChangesAsync_InsertsAddAndAddRangeRowsWithClientGeneratedOnAddKeys()
+    {
+        using var db = CreateHiLoContext();
+        var singleUser = new HiLoUser { Name = "Single" };
+        var rangeUsers = new[]
+        {
+            new HiLoUser { Name = "Range 1" },
+            new HiLoUser { Name = "Range 2" }
+        };
+        db.Users.Add(singleUser);
+        db.Users.AddRange(rangeUsers);
+
+        var savedCount = await db.BulkSaveChangesAsync(
+            _ => { },
+            (_, plan, _) =>
+            {
+                var command = AssertSingleCommand(plan);
+                AssertSql(
+                    """
+                    INSERT INTO "hilo_users" ("id", "name")
+                    VALUES (@p0, @p1), (@p2, @p3), (@p4, @p5);
+                    """,
+                    command.CommandText);
+                CollectionAssert.AreEqual(
+                    new object?[] { singleUser.Id, "Single", rangeUsers[0].Id, "Range 1", rangeUsers[1].Id, "Range 2" },
+                    command.Parameters.Select(parameter => parameter.Value).ToArray());
+                Assert.AreEqual(0, command.GeneratedValueAssignments.Count);
+                return Task.CompletedTask;
+            });
+
+        Assert.AreEqual(3, savedCount);
+        Assert.AreNotEqual(0, singleUser.Id);
+        Assert.IsTrue(rangeUsers.All(user => user.Id != 0));
+        Assert.AreEqual(EntityState.Unchanged, db.Entry(singleUser).State);
+        Assert.IsTrue(rangeUsers.All(user => db.Entry(user).State == EntityState.Unchanged));
+    }
+
+    [TestMethod]
+    public async Task BulkSaveChangesAsync_UpdatesAddAndAddRangeEntitiesWithClientGeneratedOnAddKeys()
+    {
+        using var db = CreateHiLoContext();
+        var singleUser = new HiLoUser { Name = "Single" };
+        var rangeUsers = new[]
+        {
+            new HiLoUser { Name = "Range 1" },
+            new HiLoUser { Name = "Range 2" }
+        };
+        db.Users.Add(singleUser);
+        db.Users.AddRange(rangeUsers);
+        db.ChangeTracker.AcceptAllChanges();
+
+        singleUser.Name = "Single updated";
+        rangeUsers[0].Name = "Range 1 updated";
+        rangeUsers[1].Name = "Range 2 updated";
+
+        var savedCount = await db.BulkSaveChangesAsync(
+            _ => { },
+            (_, plan, _) =>
+            {
+                var command = AssertSingleCommand(plan);
+                AssertSql(
+                    """
+                    WITH source("id", "name") AS (
+                      VALUES (@p0, @p1), (@p2, @p3), (@p4, @p5)
+                    )
+                    UPDATE "hilo_users" AS target SET
+                      "name" = source."name"
+                    FROM source
+                    WHERE target."id" = source."id";
+                    """,
+                    command.CommandText);
+                CollectionAssert.AreEqual(
+                    new object?[]
+                    {
+                        singleUser.Id,
+                        "Single updated",
+                        rangeUsers[0].Id,
+                        "Range 1 updated",
+                        rangeUsers[1].Id,
+                        "Range 2 updated"
+                    },
+                    command.Parameters.Select(parameter => parameter.Value).ToArray());
+                return Task.CompletedTask;
+            });
+
+        Assert.AreEqual(3, savedCount);
+        Assert.AreEqual(EntityState.Unchanged, db.Entry(singleUser).State);
+        Assert.IsTrue(rangeUsers.All(user => db.Entry(user).State == EntityState.Unchanged));
     }
 
     [TestMethod]
@@ -235,6 +329,104 @@ public sealed class BulkSaveChangesSqlPlannerTests
         CollectionAssert.AreEqual(
             new object?[] { "three@example.com", "Three", "C" },
             plan.Commands[1].Parameters.Select(parameter => parameter.Value).ToArray());
+    }
+
+    [TestMethod]
+    public void CreatePlan_SplitsInsertCommandsToStayUnderNpgsqlParameterLimit()
+    {
+        using var db = CreateContext();
+        for (var index = 1; index <= 21_846; index++)
+        {
+            db.Users.Add(new User { FirstName = $"First {index}", LastName = $"Last {index}", Email = $"user-{index}@example.com" });
+        }
+
+        var plan = CreatePlan(db, batchSize: 30_000);
+
+        Assert.AreEqual(2, plan.Commands.Count);
+        Assert.AreEqual(65_535, plan.Commands[0].Parameters.Count);
+        Assert.AreEqual(3, plan.Commands[1].Parameters.Count);
+        Assert.IsTrue(plan.Commands.All(command => command.Parameters.Count <= 65_535));
+    }
+
+    [TestMethod]
+    public void CreatePlan_SplitsUpdateCommandsToStayUnderNpgsqlParameterLimit()
+    {
+        using var db = CreateContext();
+        for (var index = 1; index <= 16_384; index++)
+        {
+            var user = new User { Id = index, FirstName = $"First {index}", LastName = $"Last {index}", Email = $"user-{index}@example.com" };
+            db.Attach(user);
+            user.FirstName = $"Updated {index}";
+        }
+
+        var plan = CreatePlan(db, batchSize: 30_000);
+
+        Assert.AreEqual(2, plan.Commands.Count);
+        Assert.AreEqual(65_532, plan.Commands[0].Parameters.Count);
+        Assert.AreEqual(4, plan.Commands[1].Parameters.Count);
+        Assert.IsTrue(plan.Commands.All(command => command.Parameters.Count <= 65_535));
+    }
+
+    [TestMethod]
+    public void CreatePlan_SplitsDeleteCommandsToStayUnderNpgsqlParameterLimit()
+    {
+        using var db = CreateContext();
+        for (var index = 1; index <= 65_536; index++)
+        {
+            var user = new User { Id = index, FirstName = $"First {index}", LastName = $"Last {index}", Email = $"user-{index}@example.com" };
+            db.Attach(user);
+            db.Remove(user);
+        }
+
+        var plan = CreatePlan(db, batchSize: 70_000);
+
+        Assert.AreEqual(2, plan.Commands.Count);
+        Assert.AreEqual(65_535, plan.Commands[0].Parameters.Count);
+        Assert.AreEqual(1, plan.Commands[1].Parameters.Count);
+        Assert.IsTrue(plan.Commands.All(command => command.Parameters.Count <= 65_535));
+    }
+
+    [TestMethod]
+    public async Task BulkSaveChangesAsync_LogsWarningWhenRequestedBatchSizeExceedsNpgsqlParameterLimit()
+    {
+        using var loggerProvider = new RecordingLoggerProvider();
+        using var loggerFactory = LoggerFactory.Create(builder => builder.AddProvider(loggerProvider));
+        using var db = CreateContext(loggerFactory);
+        for (var index = 1; index <= 21_846; index++)
+        {
+            db.Users.Add(new User { FirstName = $"First {index}", LastName = $"Last {index}", Email = $"user-{index}@example.com" });
+        }
+
+        await db.BulkSaveChangesAsync(
+            options => options.BatchSize = 30_000,
+            (_, plan, _) =>
+            {
+                Assert.AreEqual(2, plan.Commands.Count);
+                return Task.CompletedTask;
+            });
+
+        var warning = loggerProvider.Messages.Single(message => message.LogLevel == LogLevel.Warning);
+        Assert.IsTrue(warning.Message.Contains("requested batch size 30000", StringComparison.Ordinal));
+        Assert.IsTrue(warning.Message.Contains("effective batch size of 21845", StringComparison.Ordinal));
+        Assert.IsTrue(warning.Message.Contains("Set BatchSize to 21845 or lower", StringComparison.Ordinal));
+    }
+
+    [TestMethod]
+    public async Task BulkSaveChangesAsync_DoesNotLogWarningWhenRequestedBatchSizeIsWithinNpgsqlParameterLimit()
+    {
+        using var loggerProvider = new RecordingLoggerProvider();
+        using var loggerFactory = LoggerFactory.Create(builder => builder.AddProvider(loggerProvider));
+        using var db = CreateContext(loggerFactory);
+        for (var index = 1; index <= 100; index++)
+        {
+            db.Users.Add(new User { FirstName = $"First {index}", LastName = $"Last {index}", Email = $"user-{index}@example.com" });
+        }
+
+        await db.BulkSaveChangesAsync(
+            options => options.BatchSize = 100,
+            (_, _, _) => Task.CompletedTask);
+
+        Assert.IsFalse(loggerProvider.Messages.Any(message => message.LogLevel == LogLevel.Warning));
     }
 
     [TestMethod]
@@ -533,13 +725,28 @@ public sealed class BulkSaveChangesSqlPlannerTests
         return sql.Replace("\r\n", "\n", StringComparison.Ordinal).Trim();
     }
 
-    private static TestDbContext CreateContext()
+    private static TestDbContext CreateContext(ILoggerFactory? loggerFactory = null)
     {
-        var options = new DbContextOptionsBuilder<TestDbContext>()
+        var builder = new DbContextOptionsBuilder<TestDbContext>()
+            .UseNpgsql("Host=localhost;Database=bulk");
+
+        if (loggerFactory is not null)
+        {
+            builder.UseLoggerFactory(loggerFactory);
+        }
+
+        var options = builder.Options;
+
+        return new TestDbContext(options);
+    }
+
+    private static HiLoContext CreateHiLoContext()
+    {
+        var options = new DbContextOptionsBuilder<HiLoContext>()
             .UseNpgsql("Host=localhost;Database=bulk")
             .Options;
 
-        return new TestDbContext(options);
+        return new HiLoContext(options);
     }
 
     private sealed class TestDbContext(DbContextOptions<TestDbContext> options) : DbContext(options)
@@ -606,6 +813,25 @@ public sealed class BulkSaveChangesSqlPlannerTests
                     .HasConversion(
                         status => status == UserStatus.Active ? "active" : "inactive",
                         value => value == "active" ? UserStatus.Active : UserStatus.Inactive);
+            });
+        }
+    }
+
+    private sealed class HiLoContext(DbContextOptions<HiLoContext> options) : DbContext(options)
+    {
+        public DbSet<HiLoUser> Users => Set<HiLoUser>();
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<HiLoUser>(entity =>
+            {
+                entity.ToTable("hilo_users");
+                entity.HasKey(user => user.Id);
+                entity.Property(user => user.Id)
+                    .HasColumnName("id")
+                    .ValueGeneratedOnAdd()
+                    .HasValueGenerator<PermanentIntValueGenerator>();
+                entity.Property(user => user.Name).HasColumnName("name");
             });
         }
     }
@@ -754,6 +980,25 @@ public sealed class BulkSaveChangesSqlPlannerTests
         public UserStatus Status { get; set; }
     }
 
+    private sealed class HiLoUser
+    {
+        public int Id { get; set; }
+
+        public required string Name { get; set; }
+    }
+
+    private sealed class PermanentIntValueGenerator : ValueGenerator<int>
+    {
+        private static int NextId = 1_000;
+
+        public override bool GeneratesTemporaryValues => false;
+
+        public override int Next(EntityEntry entry)
+        {
+            return Interlocked.Increment(ref NextId);
+        }
+    }
+
     private enum UserStatus
     {
         Inactive,
@@ -813,4 +1058,44 @@ public sealed class BulkSaveChangesSqlPlannerTests
 
         public required string Name { get; set; }
     }
+
+    private sealed class RecordingLoggerProvider : ILoggerProvider
+    {
+        public List<LogMessage> Messages { get; } = [];
+
+        public ILogger CreateLogger(string categoryName)
+        {
+            return new RecordingLogger(Messages);
+        }
+
+        public void Dispose()
+        {
+        }
+    }
+
+    private sealed class RecordingLogger(List<LogMessage> messages) : ILogger
+    {
+        public IDisposable? BeginScope<TState>(TState state)
+            where TState : notnull
+        {
+            return null;
+        }
+
+        public bool IsEnabled(LogLevel logLevel)
+        {
+            return true;
+        }
+
+        public void Log<TState>(
+            LogLevel logLevel,
+            EventId eventId,
+            TState state,
+            Exception? exception,
+            Func<TState, Exception?, string> formatter)
+        {
+            messages.Add(new LogMessage(logLevel, formatter(state, exception)));
+        }
+    }
+
+    private sealed record LogMessage(LogLevel LogLevel, string Message);
 }

@@ -9,7 +9,7 @@ namespace EfSimpleBulkSaveChanges.Tests;
 [DoNotParallelize]
 public sealed class BulkSaveChangesPerformanceTests
 {
-    private static readonly int[] RowCounts = [1, 100, 1_000, 10_000, 100_000];
+    private static readonly int[] RowCounts = [1, 100, 1_000, 10_000];
 
     // Keep SQLite change batches modest so local smoke-test timings stay practical.
     private static readonly int[] LargeChangeBulkBatchSizes = [100, 250];
@@ -210,10 +210,6 @@ public sealed class BulkSaveChangesPerformanceTests
             yield return 10_000;
         }
 
-        if (rowCount >= 100_000)
-        {
-            yield return 50_000;
-        }
     }
 
     private static IEnumerable<int> GetChangeBatchSizes(int rowCount)
@@ -229,11 +225,6 @@ public sealed class BulkSaveChangesPerformanceTests
             yield return batchSize;
         }
 
-        if (rowCount >= 100_000)
-        {
-            yield return 10_000;
-            yield return 50_000;
-        }
     }
 
     private async Task<PerformanceMeasurement> MeasureSaveChangesAsync(

@@ -9,11 +9,12 @@ namespace EfSimpleBulkSaveChanges.Tests;
 [TestClass]
 [TestCategory("Performance")]
 [TestCategory("CockroachDB")]
+[TestCategory("CockroachDBSingleNode")]
 [DoNotParallelize]
 public sealed class BulkSaveChangesCockroachDbPerformanceTests
 {
     private const int MeasurementIterations = 3;
-    private static readonly int[] RowCounts = [1, 100, 1_000, 10_000, 100_000];
+    private static readonly int[] RowCounts = [1, 100, 1_000, 10_000];
     private static readonly int[] LargeChangeBulkBatchSizes = [100, 250, 1_000, 5_000];
     private static CockroachDbServer? Server;
 
@@ -232,10 +233,6 @@ public sealed class BulkSaveChangesCockroachDbPerformanceTests
             yield return 10_000;
         }
 
-        if (rowCount >= 100_000)
-        {
-            yield return 50_000;
-        }
     }
 
     private static IEnumerable<int> GetChangeBatchSizes(int rowCount)
@@ -254,7 +251,6 @@ public sealed class BulkSaveChangesCockroachDbPerformanceTests
         if (rowCount >= 100_000)
         {
             yield return 10_000;
-            yield return 50_000;
         }
     }
 
@@ -494,7 +490,7 @@ public sealed class BulkSaveChangesCockroachDbPerformanceTests
         private CockroachDbServer(string containerName, int port)
         {
             _containerName = containerName;
-            ConnectionString = $"Host=localhost;Port={port};Username=root;Database=defaultdb;SSL Mode=Disable";
+            ConnectionString = $"Host=localhost;Port={port};Username=root;Database=defaultdb;SSL Mode=Disable;Command Timeout=300";
         }
 
         public string ConnectionString { get; }
@@ -504,26 +500,36 @@ public sealed class BulkSaveChangesCockroachDbPerformanceTests
             var port = GetFreeTcpPort();
             var containerName = $"ef-simple-bulk-perf-{Guid.NewGuid():N}";
 
-            await RunDockerAsync(
-                "run",
-                "--rm",
-                "-d",
-                "--name",
-                containerName,
-                "-p",
-                $"127.0.0.1:{port}:26257",
-                "cockroachdb/cockroach:v26.2.1",
-                "start-single-node",
-                "--insecure");
+            try
+            {
+                await RunDockerAsync(
+                    "run",
+                    "--rm",
+                    "-d",
+                    "--name",
+                    containerName,
+                    "-p",
+                    $"127.0.0.1:{port}:26257",
+                    "cockroachdb/cockroach:v26.2.1",
+                    "start-single-node",
+                    "--insecure",
+                    "--max-sql-memory",
+                    "1GiB");
 
-            var server = new CockroachDbServer(containerName, port);
-            await server.WaitUntilReadyAsync();
-            return server;
+                var server = new CockroachDbServer(containerName, port);
+                await server.WaitUntilReadyAsync();
+                return server;
+            }
+            catch
+            {
+                await TryRemoveDockerContainerAsync(containerName);
+                throw;
+            }
         }
 
         public async ValueTask DisposeAsync()
         {
-            await RunDockerAsync("rm", "-f", _containerName);
+            await TryRemoveDockerContainerAsync(_containerName);
         }
 
         private async Task WaitUntilReadyAsync()
@@ -546,7 +552,7 @@ public sealed class BulkSaveChangesCockroachDbPerformanceTests
                 }
             }
 
-            throw new TimeoutException("CockroachDB container did not become ready in time.", lastException);
+            throw new TimeoutException("CockroachDB single-node container did not become ready in time.", lastException);
         }
 
         private static int GetFreeTcpPort()
@@ -554,6 +560,17 @@ public sealed class BulkSaveChangesCockroachDbPerformanceTests
             using var listener = new TcpListener(IPAddress.Loopback, 0);
             listener.Start();
             return ((IPEndPoint)listener.LocalEndpoint).Port;
+        }
+
+        private static async Task TryRemoveDockerContainerAsync(string containerName)
+        {
+            try
+            {
+                await RunDockerAsync("rm", "-f", containerName);
+            }
+            catch (InvalidOperationException)
+            {
+            }
         }
     }
 

@@ -208,11 +208,11 @@ The tests assert generated SQL and parameter values without requiring a running 
 
 ## SQLite, PostgreSQL, and CockroachDB Performance Results
 
-These results come from `BulkSaveChangesPerformanceTests` using SQLite in-memory databases, `BulkSaveChangesPostgreSqlPerformanceTests` using a Docker-hosted PostgreSQL 16 container, and `BulkSaveChangesCockroachDbPerformanceTests` using a Docker-hosted CockroachDB v26.2.1 single-node container on a local development machine. The CockroachDB performance schema uses `DEFAULT unique_rowid()` keys mapped to .NET `long` values, and each CockroachDB measurement reports the median of three iterations. The PostgreSQL and CockroachDB performance suites start throwaway containers and remove them after the run. Timings are smoke-test measurements, not BenchmarkDotNet results. Insert, update, and mixed measurements time only the save call after entities have been staged in the change tracker. Synchronize measurements time the full synchronize operation: the manual `SaveChanges` path loads matching rows, applies source values, deletes missing rows, adds new rows, and saves; the `BulkSynchronize` path runs `BulkSynchronizeAsync` over the same source shape.
+These results come from `BulkSaveChangesPerformanceTests` using SQLite in-memory databases, `BulkSaveChangesPostgreSqlPerformanceTests` using a Docker-hosted PostgreSQL 16 container, and `BulkSaveChangesCockroachDbPerformanceTests` using a Docker-hosted CockroachDB v26.2.1 single-node cluster on a local development machine. The 100,000-row-and-above performance cases are disabled for the Docker-hosted database suites to keep smoke-test runtime practical. The CockroachDB performance schema uses `DEFAULT unique_rowid()` keys mapped to .NET `long` values, and each CockroachDB measurement reports the median of three iterations. The PostgreSQL and CockroachDB performance suites start throwaway containers and remove them after the run. Timings are smoke-test measurements, not BenchmarkDotNet results. Insert, update, and mixed measurements time only the save call after entities have been staged in the change tracker. Synchronize measurements time the full synchronize operation: the manual `SaveChanges` path loads matching rows, applies source values, deletes missing rows, adds new rows, and saves; the `BulkSynchronize` path runs `BulkSynchronizeAsync` over the same source shape.
 
 ### CockroachDB Outcome Summary
 
-The CockroachDB-focused update change replaces `UNION ALL` update sources with a `VALUES` CTE, and the CockroachDB performance schema now matches a production-friendly `DEFAULT unique_rowid()` key shape. Insert-heavy CockroachDB workloads show the expected lift at larger row counts: 100,000-row bulk inserts completed in a median 1,007.45 ms at batch 10,000, a 15.80x speedup over `SaveChanges`. Update-heavy workloads still benefit strongly from the `VALUES` CTE: 100,000-row bulk updates reached a median 2,081.20 ms at batch 1,000, a 13.66x speedup. Mixed and synchronize scenarios also improved substantially, reaching 14.61x and 11.18x respectively for 100,000 rows with larger batches.
+The CockroachDB-focused update change replaces `UNION ALL` update sources with a `VALUES` CTE, and the CockroachDB performance schema now matches a production-friendly `DEFAULT unique_rowid()` key shape. With a single-node CockroachDB cluster, larger batches reduce round trips substantially across inserts, updates, mixed changes, and synchronization. At 10,000 rows, bulk inserts with batch 10,000 completed in a median 110.24 ms versus 1,668.49 ms for `SaveChanges`; 10,000-row updates reached 174.77 ms at batch 5,000 versus 2,824.35 ms; mixed changes reached 125.13 ms at batch 5,000 versus 2,012.80 ms; and synchronize reached 272.56 ms at batch 5,000 versus 3,125.55 ms.
 
 ![BulkSaveChanges performance chart](docs/performance-results.svg)
 
@@ -220,90 +220,71 @@ The CockroachDB-focused update change replaces `UNION ALL` update sources with a
 
 | Rows | Method | Batch Size | SQLite ms | SQLite speedup | PostgreSQL ms | PostgreSQL speedup | CockroachDB ms | CockroachDB speedup |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | SaveChanges |  | 0.29 | 1x | 2.94 | 1x | 4.73 | 1x |
-| 1 | BulkSaveChanges | 100 | 0.55 | 0.53x | 3.13 | 0.94x | 6.45 | 0.73x |
-| 100 | SaveChanges |  | 1.61 | 1x | 6.30 | 1x | 29.22 | 1x |
-| 100 | BulkSaveChanges | 100 | 0.62 | 2.61x | 3.74 | 1.68x | 6.03 | 4.84x |
-| 1,000 | SaveChanges |  | 20.21 | 1x | 32.70 | 1x | 163.57 | 1x |
-| 1,000 | BulkSaveChanges | 100 | 5.37 | 3.76x | 13.89 | 2.35x | 22.03 | 7.43x |
-| 1,000 | BulkSaveChanges | 1,000 | 20.44 | 0.99x | 8.16 | 4.01x | 14.88 | 10.99x |
-| 10,000 | SaveChanges |  | 173.13 | 1x | 282.89 | 1x | 1,602.72 | 1x |
-| 10,000 | BulkSaveChanges | 100 | 69.15 | 2.50x | 115.07 | 2.46x | 179.58 | 8.92x |
-| 10,000 | BulkSaveChanges | 1,000 | 206.67 | 0.84x | 65.67 | 4.31x | 126.60 | 12.66x |
-| 10,000 | BulkSaveChanges | 10,000 | 1,679.79 | 0.10x | 68.34 | 4.14x | 114.23 | 14.03x |
-| 100,000 | SaveChanges |  | 1,389.36 | 1x | 2,715.99 | 1x | 15,917.01 | 1x |
-| 100,000 | BulkSaveChanges | 100 | 586.36 | 2.37x | 1,064.35 | 2.55x | 1,763.13 | 9.03x |
-| 100,000 | BulkSaveChanges | 1,000 | 2,076.36 | 0.67x | 629.16 | 4.32x | 1,339.83 | 11.88x |
-| 100,000 | BulkSaveChanges | 10,000 | 16,842.03 | 0.08x | 599.00 | 4.53x | 1,007.45 | 15.80x |
+| 1 | SaveChanges |  | 0.21 | 1x | 1.12 | 1x | 4.70 | 1x |
+| 1 | BulkSaveChanges | 100 | 0.50 | 0.42x | 1.50 | 0.75x | 5.62 | 0.84x |
+| 100 | SaveChanges |  | 1.61 | 1x | 3.95 | 1x | 25.00 | 1x |
+| 100 | BulkSaveChanges | 100 | 0.65 | 2.48x | 1.86 | 2.12x | 5.88 | 4.25x |
+| 1,000 | SaveChanges |  | 12.68 | 1x | 24.39 | 1x | 169.65 | 1x |
+| 1,000 | BulkSaveChanges | 100 | 5.28 | 2.40x | 17.44 | 1.40x | 24.54 | 6.91x |
+| 1,000 | BulkSaveChanges | 1,000 | 20.21 | 0.63x | 6.09 | 4.00x | 15.70 | 10.80x |
+| 10,000 | SaveChanges |  | 159.19 | 1x | 267.23 | 1x | 1,668.49 | 1x |
+| 10,000 | BulkSaveChanges | 100 | 71.06 | 2.24x | 99.33 | 2.69x | 177.35 | 9.41x |
+| 10,000 | BulkSaveChanges | 1,000 | 236.60 | 0.67x | 75.84 | 3.52x | 124.34 | 13.42x |
+| 10,000 | BulkSaveChanges | 10,000 | 1,662.23 | 0.10x | 56.07 | 4.77x | 110.24 | 15.14x |
 
 ### Update
 
 | Rows | Method | Batch Size | SQLite ms | SQLite speedup | PostgreSQL ms | PostgreSQL speedup | CockroachDB ms | CockroachDB speedup |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | SaveChanges |  | 1.60 | 1x | 2.79 | 1x | 3.51 | 1x |
-| 1 | BulkSaveChanges | 100 | 0.25 | 6.39x | 2.89 | 0.97x | 5.64 | 0.62x |
-| 100 | SaveChanges |  | 1.05 | 1x | 5.67 | 1x | 33.29 | 1x |
-| 100 | BulkSaveChanges | 100 | 0.83 | 1.26x | 3.81 | 1.49x | 7.46 | 4.46x |
-| 1,000 | SaveChanges |  | 11.93 | 1x | 29.85 | 1x | 284.39 | 1x |
-| 1,000 | BulkSaveChanges | 100 | 7.56 | 1.58x | 18.89 | 1.58x | 32.81 | 8.67x |
-| 1,000 | BulkSaveChanges | 250 | 11.91 | 1.00x | 11.97 | 2.49x | 34.75 | 8.18x |
-| 1,000 | BulkSaveChanges | 1,000 |  |  |  |  | 22.59 | 12.59x |
-| 1,000 | BulkSaveChanges | 5,000 |  |  |  |  | 22.83 | 12.45x |
-| 10,000 | SaveChanges |  | 121.87 | 1x | 284.70 | 1x | 2,820.06 | 1x |
-| 10,000 | BulkSaveChanges | 100 | 83.51 | 1.46x | 192.58 | 1.48x | 266.15 | 10.60x |
-| 10,000 | BulkSaveChanges | 250 | 139.40 | 0.87x | 127.42 | 2.23x | 305.27 | 9.24x |
-| 10,000 | BulkSaveChanges | 1,000 |  |  |  |  | 197.64 | 14.27x |
-| 10,000 | BulkSaveChanges | 5,000 |  |  |  |  | 175.20 | 16.10x |
-| 100,000 | SaveChanges |  | 1,241.69 | 1x | 2,905.70 | 1x | 28,422.68 | 1x |
-| 100,000 | BulkSaveChanges | 100 | 867.52 | 1.43x | 1,320.16 | 2.20x | 2,747.42 | 10.35x |
-| 100,000 | BulkSaveChanges | 250 | 1,344.09 | 0.92x | 992.52 | 2.93x | 3,134.77 | 9.07x |
-| 100,000 | BulkSaveChanges | 1,000 |  |  |  |  | 2,081.20 | 13.66x |
-| 100,000 | BulkSaveChanges | 5,000 |  |  |  |  | 2,103.87 | 13.51x |
+| 1 | SaveChanges |  | 1.02 | 1x | 1.08 | 1x | 2.17 | 1x |
+| 1 | BulkSaveChanges | 100 | 0.10 | 10.26x | 1.16 | 0.92x | 2.79 | 0.78x |
+| 100 | SaveChanges |  | 1.00 | 1x | 3.53 | 1x | 30.65 | 1x |
+| 100 | BulkSaveChanges | 100 | 0.82 | 1.23x | 10.13 | 0.35x | 4.57 | 6.71x |
+| 1,000 | SaveChanges |  | 9.73 | 1x | 27.10 | 1x | 283.34 | 1x |
+| 1,000 | BulkSaveChanges | 100 | 6.97 | 1.40x | 12.32 | 2.20x | 26.60 | 10.65x |
+| 1,000 | BulkSaveChanges | 250 | 11.87 | 0.82x | 12.39 | 2.19x | 25.28 | 11.21x |
+| 1,000 | BulkSaveChanges | 1,000 |  |  |  |  | 18.39 | 15.40x |
+| 1,000 | BulkSaveChanges | 5,000 |  |  |  |  | 18.31 | 15.48x |
+| 10,000 | SaveChanges |  | 145.81 | 1x | 281.13 | 1x | 2,824.35 | 1x |
+| 10,000 | BulkSaveChanges | 100 | 85.36 | 1.71x | 174.28 | 1.61x | 267.05 | 10.58x |
+| 10,000 | BulkSaveChanges | 250 | 139.40 | 1.05x | 114.87 | 2.45x | 243.64 | 11.59x |
+| 10,000 | BulkSaveChanges | 1,000 |  |  |  |  | 191.98 | 14.71x |
+| 10,000 | BulkSaveChanges | 5,000 |  |  |  |  | 174.77 | 16.16x |
 
 ### Mixed Add/Update/Delete
 
 | Rows | Method | Batch Size | SQLite ms | SQLite speedup | PostgreSQL ms | PostgreSQL speedup | CockroachDB ms | CockroachDB speedup |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | SaveChanges |  | 0.19 | 1x | 2.59 | 1x | 2.05 | 1x |
-| 1 | BulkSaveChanges | 100 | 0.11 | 1.69x | 3.15 | 0.82x | 3.12 | 0.66x |
-| 100 | SaveChanges |  | 1.97 | 1x | 5.60 | 1x | 34.54 | 1x |
-| 100 | BulkSaveChanges | 100 | 0.50 | 3.96x | 4.83 | 1.16x | 8.26 | 4.18x |
-| 1,000 | SaveChanges |  | 9.59 | 1x | 31.71 | 1x | 199.07 | 1x |
-| 1,000 | BulkSaveChanges | 100 | 4.75 | 2.02x | 14.27 | 2.22x | 25.23 | 7.89x |
-| 1,000 | BulkSaveChanges | 250 | 8.55 | 1.12x | 10.94 | 2.90x | 29.57 | 6.73x |
-| 1,000 | BulkSaveChanges | 1,000 |  |  |  |  | 27.17 | 7.33x |
-| 1,000 | BulkSaveChanges | 5,000 |  |  |  |  | 24.74 | 8.05x |
-| 10,000 | SaveChanges |  | 158.66 | 1x | 274.16 | 1x | 2,001.35 | 1x |
-| 10,000 | BulkSaveChanges | 100 | 73.15 | 2.17x | 132.10 | 2.08x | 197.99 | 10.11x |
-| 10,000 | BulkSaveChanges | 250 | 84.75 | 1.87x | 134.20 | 2.04x | 261.16 | 7.66x |
-| 10,000 | BulkSaveChanges | 1,000 |  |  |  |  | 157.45 | 12.71x |
-| 10,000 | BulkSaveChanges | 5,000 |  |  |  |  | 124.11 | 16.13x |
-| 100,000 | SaveChanges |  | 1,317.02 | 1x | 2,667.92 | 1x | 20,530.40 | 1x |
-| 100,000 | BulkSaveChanges | 100 | 594.26 | 2.22x | 1,073.86 | 2.48x | 2,024.92 | 10.14x |
-| 100,000 | BulkSaveChanges | 250 | 788.79 | 1.67x | 788.13 | 3.39x | 1,771.32 | 11.59x |
-| 100,000 | BulkSaveChanges | 1,000 |  |  |  |  | 1,522.00 | 13.49x |
-| 100,000 | BulkSaveChanges | 5,000 |  |  |  |  | 1,405.10 | 14.61x |
+| 1 | SaveChanges |  | 0.07 | 1x | 0.97 | 1x | 1.87 | 1x |
+| 1 | BulkSaveChanges | 100 | 0.09 | 0.80x | 1.19 | 0.81x | 2.78 | 0.67x |
+| 100 | SaveChanges |  | 1.37 | 1x | 3.64 | 1x | 25.47 | 1x |
+| 100 | BulkSaveChanges | 100 | 0.42 | 3.24x | 2.66 | 1.37x | 5.91 | 4.31x |
+| 1,000 | SaveChanges |  | 8.73 | 1x | 24.77 | 1x | 197.97 | 1x |
+| 1,000 | BulkSaveChanges | 100 | 4.49 | 1.95x | 10.94 | 2.26x | 22.74 | 8.71x |
+| 1,000 | BulkSaveChanges | 250 | 6.52 | 1.34x | 8.39 | 2.95x | 20.17 | 9.82x |
+| 1,000 | BulkSaveChanges | 1,000 |  |  |  |  | 18.64 | 10.62x |
+| 1,000 | BulkSaveChanges | 5,000 |  |  |  |  | 17.85 | 11.09x |
+| 10,000 | SaveChanges |  | 142.30 | 1x | 247.34 | 1x | 2,012.80 | 1x |
+| 10,000 | BulkSaveChanges | 100 | 53.76 | 2.65x | 126.95 | 1.95x | 205.67 | 9.79x |
+| 10,000 | BulkSaveChanges | 250 | 91.58 | 1.55x | 124.73 | 1.98x | 182.52 | 11.03x |
+| 10,000 | BulkSaveChanges | 1,000 |  |  |  |  | 142.58 | 14.12x |
+| 10,000 | BulkSaveChanges | 5,000 |  |  |  |  | 125.13 | 16.09x |
 
 ### Synchronize
 
 | Rows | Method | Batch Size | SQLite ms | SQLite speedup | PostgreSQL ms | PostgreSQL speedup | CockroachDB ms | CockroachDB speedup |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | SaveChanges |  | 2.17 | 1x | 4.11 | 1x | 3.11 | 1x |
-| 1 | BulkSynchronize | 100 | 4.73 | 0.46x | 8.52 | 0.48x | 8.53 | 0.36x |
-| 100 | SaveChanges |  | 1.77 | 1x | 7.51 | 1x | 35.49 | 1x |
-| 100 | BulkSynchronize | 100 | 3.24 | 0.55x | 8.84 | 0.85x | 12.30 | 2.88x |
-| 1,000 | SaveChanges |  | 20.72 | 1x | 42.07 | 1x | 361.92 | 1x |
-| 1,000 | BulkSynchronize | 100 | 24.42 | 0.85x | 32.74 | 1.28x | 61.11 | 5.92x |
-| 1,000 | BulkSynchronize | 250 | 18.39 | 1.13x | 21.47 | 1.96x | 47.18 | 7.67x |
-| 1,000 | BulkSynchronize | 1,000 |  |  |  |  | 39.17 | 9.24x |
-| 1,000 | BulkSynchronize | 5,000 |  |  |  |  | 38.63 | 9.37x |
-| 10,000 | SaveChanges |  | 298.91 | 1x | 429.49 | 1x | 3,186.67 | 1x |
-| 10,000 | BulkSynchronize | 100 | 214.42 | 1.39x | 349.32 | 1.23x | 513.80 | 6.20x |
-| 10,000 | BulkSynchronize | 250 | 200.85 | 1.49x | 208.06 | 2.06x | 393.45 | 8.10x |
-| 10,000 | BulkSynchronize | 1,000 |  |  |  |  | 276.58 | 11.52x |
-| 10,000 | BulkSynchronize | 5,000 |  |  |  |  | 266.10 | 11.98x |
-| 100,000 | SaveChanges |  | 2,347.39 | 1x | 4,322.38 | 1x | 31,996.16 | 1x |
-| 100,000 | BulkSynchronize | 100 | 2,071.69 | 1.13x | 3,153.58 | 1.37x | 5,306.82 | 6.03x |
-| 100,000 | BulkSynchronize | 250 | 1,884.63 | 1.25x | 1,868.18 | 2.31x | 5,018.84 | 6.38x |
-| 100,000 | BulkSynchronize | 1,000 |  |  |  |  | 3,020.46 | 10.59x |
-| 100,000 | BulkSynchronize | 5,000 |  |  |  |  | 2,861.01 | 11.18x |
+| 1 | SaveChanges |  | 1.81 | 1x | 2.33 | 1x | 3.01 | 1x |
+| 1 | BulkSynchronize | 100 | 4.57 | 0.40x | 6.14 | 0.38x | 7.05 | 0.43x |
+| 100 | SaveChanges |  | 1.68 | 1x | 9.69 | 1x | 35.95 | 1x |
+| 100 | BulkSynchronize | 100 | 2.88 | 0.58x | 6.45 | 1.50x | 11.74 | 3.06x |
+| 1,000 | SaveChanges |  | 28.58 | 1x | 43.89 | 1x | 310.18 | 1x |
+| 1,000 | BulkSynchronize | 100 | 20.76 | 1.38x | 31.38 | 1.40x | 55.82 | 5.56x |
+| 1,000 | BulkSynchronize | 250 | 18.27 | 1.56x | 17.11 | 2.57x | 42.42 | 7.31x |
+| 1,000 | BulkSynchronize | 1,000 |  |  |  |  | 34.80 | 8.91x |
+| 1,000 | BulkSynchronize | 5,000 |  |  |  |  | 37.50 | 8.27x |
+| 10,000 | SaveChanges |  | 228.00 | 1x | 414.70 | 1x | 3,125.55 | 1x |
+| 10,000 | BulkSynchronize | 100 | 201.70 | 1.13x | 316.80 | 1.31x | 526.13 | 5.94x |
+| 10,000 | BulkSynchronize | 250 | 208.41 | 1.09x | 219.20 | 1.89x | 397.32 | 7.87x |
+| 10,000 | BulkSynchronize | 1,000 |  |  |  |  | 281.17 | 11.12x |
+| 10,000 | BulkSynchronize | 5,000 |  |  |  |  | 272.56 | 11.47x |

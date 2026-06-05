@@ -1,13 +1,18 @@
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
 
 namespace EfSimpleBulkSaveChanges;
 
 internal static class BulkSaveChangesSqlPlanner
 {
+    private const int MaxParametersPerCommand = 65_535;
+    private const string LoggerName = "EfSimpleBulkSaveChanges.BulkSaveChanges";
+
     public static BulkSaveChangesPlan CreatePlan(
         DbContext context,
         IReadOnlyList<EntityEntry> entries,
@@ -22,7 +27,7 @@ internal static class BulkSaveChangesSqlPlanner
 
         foreach (var entityGroup in entries.GroupBy(entry => entry.Metadata))
         {
-            var mapping = EntityMapping.Create(entityGroup.Key);
+            var mapping = EntityMapping.Create(context, entityGroup.Key);
             var entityEntries = entityGroup.ToList();
 
             commands.AddRange(CreateInsertCommands(mapping, entityEntries.Where(entry => entry.State == EntityState.Added), options.BatchSize));
@@ -38,17 +43,31 @@ internal static class BulkSaveChangesSqlPlanner
         IEnumerable<EntityEntry> entries,
         int batchSize)
     {
-        foreach (var batch in entries.Chunk(batchSize))
+        var entryList = entries.ToList();
+        var effectiveBatchSize = GetEffectiveBatchSize(mapping, "insert", batchSize, mapping.MaxInsertParametersPerRow, entryList.Count);
+
+        foreach (var batch in entryList.Chunk(effectiveBatchSize))
         {
             if (batch.Length == 0)
             {
                 continue;
             }
 
+            var insertProperties = mapping.GetInsertProperties(batch);
+            var actualBatchSize = GetEffectiveBatchSize(mapping, "insert", batch.Length, insertProperties.Count, batch.Length);
+            if (actualBatchSize < batch.Length)
+            {
+                foreach (var command in CreateInsertCommands(mapping, batch, actualBatchSize))
+                {
+                    yield return command;
+                }
+
+                continue;
+            }
+
             var parameters = new List<BulkSaveChangesParameter>();
             var generatedAssignments = new List<GeneratedValueAssignment>();
-            var insertProperties = mapping.InsertProperties;
-            var generatedProperties = mapping.GeneratedProperties;
+            var generatedProperties = mapping.GetGeneratedProperties(batch);
             var sql = new StringBuilder();
 
             sql.Append("INSERT INTO ");
@@ -104,10 +123,18 @@ internal static class BulkSaveChangesSqlPlanner
         IEnumerable<EntityEntry> entries,
         int batchSize)
     {
-        foreach (var batch in entries.Chunk(batchSize))
+        var entryList = entries.ToList();
+        var updateProperties = mapping.UpdatableProperties;
+        if (updateProperties.Count == 0)
         {
-            var updateProperties = mapping.UpdatableProperties;
-            if (batch.Length == 0 || updateProperties.Count == 0)
+            yield break;
+        }
+
+        var effectiveBatchSize = GetEffectiveBatchSize(mapping, "update", batchSize, updateProperties.Count + 1, entryList.Count);
+
+        foreach (var batch in entryList.Chunk(effectiveBatchSize))
+        {
+            if (batch.Length == 0)
             {
                 continue;
             }
@@ -182,7 +209,10 @@ internal static class BulkSaveChangesSqlPlanner
         IEnumerable<EntityEntry> entries,
         int batchSize)
     {
-        foreach (var batch in entries.Chunk(batchSize))
+        var entryList = entries.ToList();
+        var effectiveBatchSize = GetEffectiveBatchSize(mapping, "delete", batchSize, 1, entryList.Count);
+
+        foreach (var batch in entryList.Chunk(effectiveBatchSize))
         {
             if (batch.Length == 0)
             {
@@ -202,6 +232,41 @@ internal static class BulkSaveChangesSqlPlanner
 
             yield return new BulkSaveChangesCommand(sql.ToString(), parameters, []);
         }
+    }
+
+    private static int GetEffectiveBatchSize(
+        EntityMapping mapping,
+        string operation,
+        int requestedBatchSize,
+        int parametersPerRow,
+        int rowCount)
+    {
+        if (parametersPerRow <= 0)
+        {
+            return requestedBatchSize;
+        }
+
+        if (parametersPerRow > MaxParametersPerCommand)
+        {
+            throw new NotSupportedException(
+                $"Entity type '{mapping.EntityTypeName}' requires {parametersPerRow} parameters per {operation} row, which exceeds the Npgsql single-command parameter limit of {MaxParametersPerCommand}.");
+        }
+
+        var effectiveBatchSize = Math.Min(requestedBatchSize, MaxParametersPerCommand / parametersPerRow);
+        if (effectiveBatchSize < requestedBatchSize && rowCount > effectiveBatchSize)
+        {
+            mapping.Logger.LogWarning(
+                "Bulk {Operation} for entity type '{EntityType}' requested batch size {RequestedBatchSize}, but each row uses {ParametersPerRow} parameters. To stay under Npgsql's {MaxParametersPerCommand}-parameter command limit, commands will be split using an effective batch size of {EffectiveBatchSize}. Set BatchSize to {EffectiveBatchSize} or lower to avoid this warning.",
+                operation,
+                mapping.EntityTypeName,
+                requestedBatchSize,
+                parametersPerRow,
+                MaxParametersPerCommand,
+                effectiveBatchSize,
+                effectiveBatchSize);
+        }
+
+        return effectiveBatchSize;
     }
 
     private static string GetOrAddKeyParameter(
@@ -234,24 +299,30 @@ internal static class BulkSaveChangesSqlPlanner
         private readonly IReadOnlyDictionary<IProperty, string> _columnNames;
 
         private EntityMapping(
+            string entityTypeName,
             string tableIdentifier,
             IProperty keyProperty,
             string keyColumnIdentifier,
             IReadOnlyList<IProperty> insertProperties,
             IReadOnlyList<IProperty> updatableProperties,
             IReadOnlyList<IProperty> generatedProperties,
-            IReadOnlyDictionary<IProperty, string> columnNames)
+            IReadOnlyDictionary<IProperty, string> columnNames,
+            ILogger logger)
         {
             TableIdentifier = tableIdentifier;
+            EntityTypeName = entityTypeName;
             KeyProperty = keyProperty;
             KeyColumnIdentifier = keyColumnIdentifier;
             InsertProperties = insertProperties;
             UpdatableProperties = updatableProperties;
             GeneratedProperties = generatedProperties;
             _columnNames = columnNames;
+            Logger = logger;
         }
 
         public string TableIdentifier { get; }
+
+        public string EntityTypeName { get; }
 
         public IProperty KeyProperty { get; }
 
@@ -263,7 +334,11 @@ internal static class BulkSaveChangesSqlPlanner
 
         public IReadOnlyList<IProperty> GeneratedProperties { get; }
 
-        public static EntityMapping Create(IEntityType entityType)
+        public int MaxInsertParametersPerRow => InsertProperties.Count;
+
+        public ILogger Logger { get; }
+
+        public static EntityMapping Create(DbContext context, IEntityType entityType)
         {
             if (entityType.IsOwned())
             {
@@ -342,18 +417,45 @@ internal static class BulkSaveChangesSqlPlanner
                 : $"{QuoteIdentifier(schema)}.{QuoteIdentifier(tableName)}";
 
             return new EntityMapping(
+                entityType.DisplayName(),
                 tableIdentifier,
                 keyProperty,
                 QuoteIdentifier(columnNames[keyProperty]),
                 insertProperties,
                 updatableProperties,
                 generatedProperties,
-                columnNames);
+                columnNames,
+                context.GetService<ILoggerFactory>().CreateLogger(LoggerName));
         }
 
         public string GetColumnIdentifier(IProperty property)
         {
             return QuoteIdentifier(_columnNames[property]);
+        }
+
+        public IReadOnlyList<IProperty> GetInsertProperties(IReadOnlyList<EntityEntry> entries)
+        {
+            return InsertProperties
+                .Concat(GeneratedProperties.Where(property => IsClientGeneratedKey(property) && HasPermanentGeneratedValues(entries, property)))
+                .OrderBy(property => _columnNames[property], StringComparer.Ordinal)
+                .ToList();
+        }
+
+        public IReadOnlyList<IProperty> GetGeneratedProperties(IReadOnlyList<EntityEntry> entries)
+        {
+            return GeneratedProperties
+                .Where(property => !IsClientGeneratedKey(property) || !HasPermanentGeneratedValues(entries, property))
+                .ToList();
+        }
+
+        private static bool IsClientGeneratedKey(IProperty property)
+        {
+            return property.IsPrimaryKey();
+        }
+
+        private static bool HasPermanentGeneratedValues(IReadOnlyList<EntityEntry> entries, IProperty property)
+        {
+            return entries.All(entry => !entry.Property(property).IsTemporary);
         }
     }
 
