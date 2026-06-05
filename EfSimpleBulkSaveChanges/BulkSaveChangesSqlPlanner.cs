@@ -269,22 +269,6 @@ internal static class BulkSaveChangesSqlPlanner
         return effectiveBatchSize;
     }
 
-    private static string GetOrAddKeyParameter(
-        EntityMapping mapping,
-        EntityEntry entry,
-        List<BulkSaveChangesParameter> parameters,
-        Dictionary<EntityEntry, string> keyParameterNames)
-    {
-        if (keyParameterNames.TryGetValue(entry, out var parameterName))
-        {
-            return parameterName;
-        }
-
-        parameterName = AddParameter(parameters, entry.Property(mapping.KeyProperty).CurrentValue, mapping.KeyProperty);
-        keyParameterNames.Add(entry, parameterName);
-        return parameterName;
-    }
-
     private static string AddParameter(List<BulkSaveChangesParameter> parameters, object? value, IProperty property)
     {
         var parameterName = $"@p{parameters.Count}";

@@ -117,7 +117,7 @@ public sealed class BulkSaveChangesPerformanceTests
                 async db =>
                     {
                         await SeedUsersAsync(db, rowCount, "save-mixed");
-                        return await StageMixedChangesAsync(db, rowCount, "save-mixed");
+                        return await StageMixedChangesAsync(db, "save-mixed");
                     });
 
             foreach (var batchSize in GetChangeBatchSizes(rowCount))
@@ -130,7 +130,7 @@ public sealed class BulkSaveChangesPerformanceTests
                     async db =>
                     {
                         await SeedUsersAsync(db, rowCount, $"bulk-mixed-{batchSize}");
-                        return await StageMixedChangesAsync(db, rowCount, $"bulk-mixed-{batchSize}");
+                        return await StageMixedChangesAsync(db, $"bulk-mixed-{batchSize}");
                     });
             }
         }
@@ -286,7 +286,7 @@ public sealed class BulkSaveChangesPerformanceTests
         }
     }
 
-    private static async Task<int> StageMixedChangesAsync(PerformanceDbContext db, int rowCount, string prefix)
+    private static async Task<int> StageMixedChangesAsync(PerformanceDbContext db, string prefix)
     {
         var users = await db.Users.OrderBy(user => user.Id).ToListAsync();
         var updateCount = 0;
