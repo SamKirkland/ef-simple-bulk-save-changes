@@ -86,6 +86,80 @@ public sealed class BulkSaveChangesIntegrationTests
     }
 
     [TestMethod]
+    public async Task BulkSaveChangesAsync_CommitsExistingTransactionWhenCallerCommits()
+    {
+        await using var fixture = await SqliteFixture.CreateAsync();
+        await using var db = fixture.CreateContext();
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        db.Users.AddRange(CreateUsers(2));
+
+        var savedCount = await db.BulkSaveChangesAsync(batchSize: 2);
+        await transaction.CommitAsync();
+
+        Assert.AreEqual(2, savedCount);
+
+        await using var readDb = fixture.CreateContext();
+        Assert.AreEqual(2, await readDb.Users.CountAsync());
+    }
+
+    [TestMethod]
+    public async Task BulkSaveChangesAsync_RollsBackOwnedTransactionWhenLaterBatchFails()
+    {
+        await using var fixture = await SqliteFixture.CreateAsync();
+        await using (var setupDb = fixture.CreateContext())
+        {
+            await CreateFailingUser6TriggerAsync(setupDb);
+        }
+
+        await using var db = fixture.CreateContext();
+        var users = CreateUsers(10).ToList();
+        db.Users.AddRange(users);
+
+        await Assert.ThrowsExceptionAsync<SqliteException>(() => db.BulkSaveChangesAsync(batchSize: 2));
+        Assert.IsTrue(users.All(user => db.Entry(user).State == EntityState.Added));
+
+        await using var readDb = fixture.CreateContext();
+        Assert.AreEqual(0, await readDb.Users.CountAsync());
+    }
+
+    [TestMethod]
+    public async Task BulkSaveChangesAsync_ExistingTransactionCanCommitSuccessfulBatchesAfterLaterBatchFails()
+    {
+        await using var fixture = await SqliteFixture.CreateAsync();
+        await using (var setupDb = fixture.CreateContext())
+        {
+            await CreateFailingUser6TriggerAsync(setupDb);
+        }
+
+        await using var db = fixture.CreateContext();
+        await using var transaction = await db.Database.BeginTransactionAsync();
+        var users = CreateUsers(10).ToList();
+        db.Users.AddRange(users);
+
+        await Assert.ThrowsExceptionAsync<SqliteException>(() => db.BulkSaveChangesAsync(batchSize: 2));
+        await transaction.CommitAsync();
+
+        Assert.IsTrue(users.All(user => db.Entry(user).State == EntityState.Added));
+
+        await using var readDb = fixture.CreateContext();
+        var persistedEmails = await readDb.Users
+            .AsNoTracking()
+            .OrderBy(user => user.Id)
+            .Select(user => user.Email)
+            .ToListAsync();
+
+        CollectionAssert.AreEqual(
+            new[]
+            {
+                "user-1@example.com",
+                "user-2@example.com",
+                "user-3@example.com",
+                "user-4@example.com"
+            },
+            persistedEmails);
+    }
+
+    [TestMethod]
     public async Task BulkSaveChangesAsync_RollsBackOwnedTransactionWhenCommandFails()
     {
         await using var fixture = await SqliteFixture.CreateAsync();
@@ -193,6 +267,30 @@ public sealed class BulkSaveChangesIntegrationTests
             .Options;
 
         return new TestDbContext(options);
+    }
+
+    private static Task CreateFailingUser6TriggerAsync(TestDbContext db)
+    {
+        return db.Database.ExecuteSqlRawAsync(
+            """
+            CREATE TRIGGER fail_user_6
+            BEFORE INSERT ON users
+            WHEN NEW.email = 'user-6@example.com'
+            BEGIN
+                SELECT RAISE(ABORT, 'user 6 failed');
+            END;
+            """);
+    }
+
+    private static IEnumerable<User> CreateUsers(int count)
+    {
+        return Enumerable.Range(1, count)
+            .Select(index => new User
+            {
+                FirstName = $"First {index}",
+                LastName = $"Last {index}",
+                Email = $"user-{index}@example.com"
+            });
     }
 
     private sealed class TestDbContext(DbContextOptions<TestDbContext> options) : DbContext(options)
