@@ -1,47 +1,37 @@
 # EF Simple Bulk Save Changes
 
-Small EF Core helpers for reducing database round trips without adopting a large bulk library. The focus is simple PostgreSQL/CockroachDB-friendly SQL: multi-row inserts, batched updates, batched deletes, and source-list synchronization without `MERGE`, temp tables, or CTE-heavy tricks.
+Small EF Core utilities for reducing database round trips and improving entity framework insert and update performance without adopting a large bulk library. The focus is simple PostgreSQL/CockroachDB-friendly SQL without `MERGE`, temp tables, or CTE-heavy tricks.
 
 ## Quick Start
 
-Copy these files from `EfSimpleBulkSaveChanges/` into your app or shared library:
+There is no nuget package, instead copy the files from `EfSimpleBulkSaveChanges/` into your app or shared library:
 
-```text
-BulkSaveChangesCommand.cs
-BulkSaveChangesCommandExecutor.cs
-BulkSaveChangesExtensions.cs
-BulkSaveChangesOptions.cs
-BulkSaveChangesSqlPlanner.cs
-BulkSynchronizeEntityMapping.cs
-BulkSynchronizeExtensions.cs
-BulkSynchronizeOptions.cs
-BulkSynchronizeQueryFactory.cs
-```
+## Available Utilities
 
-Add EF Core relational support if your project does not already reference it:
+### Example
 
-```xml
-<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.2" />
-```
-
-Then use the extension methods:
+`BulkSaveChangesAsync()` is a drop-in replacement for `SaveChanges()` and works by plugging into entity frameworks tracked changes (`Added`, `Modified`, and `Deleted` entities).
 
 ```csharp
 using EfSimpleBulkSaveChanges;
 
-await db.BulkSaveChangesAsync();
-await db.BulkSaveChangesAsync(batchSize: 2_000);
+using var dbContext = new AppDbContext();
 
-await db.BulkSynchronizeAsync(usersFromImport);
-await db.BulkSynchronizeAsync(usersFromImport, options =>
+// 1. Create your list of entities
+var newUsers = new List<User>
 {
-    options.BatchSize = 5_000;
-    options.DeleteMissing = true;
-    options.DeleteScopePropertyNames.Add(nameof(User.TenantId));
-});
-```
+    new User { Name = "Alice", Email = "alice@example.com" },
+    new User { Name = "Bob", Email = "bob@example.com" },
+    ...
+};
 
-`BulkSaveChangesAsync` saves tracked `Added`, `Modified`, and `Deleted` entities. `BulkSynchronizeAsync` accepts detached/source entities, loads matching rows by primary key, applies changes through EF tracking, inserts missing rows, and optionally deletes rows missing from the source.
+// 2. Add the list to the DbContext
+dbContext.Users.AddRange(newUsers);
+
+// 3. Save changes to the database using BulkSaveChangesAsync() instead of SaveChanges()
+// dbContext.SaveChanges();
+await dbContext.BulkSaveChangesAsync();
+```
 
 ## Example Entity
 
@@ -50,7 +40,7 @@ The SQL examples below assume:
 ```csharp
 public sealed class User
 {
-    public int Id { get; set; }
+    public long Id { get; set; }
     public required string FirstName { get; set; }
     public required string LastName { get; set; }
     public string? Email { get; set; }
@@ -60,17 +50,18 @@ public sealed class User
 
 ## SQL Shape
 
-Exact parameter names and aliases can vary by provider/version. These examples show the important difference: EF usually emits one data-change command per tracked row, while this library batches rows into fewer commands.
+Entity Framework usually emits one database command per tracked row, while this library batches rows into a single insert or update command for all rows.
 
 ### Insert
 
 ```csharp
-db.Users.AddRange(
+dbContext.Users.AddRange(
     new User { FirstName = "John", LastName = "Doe", Email = "john.doe@example.com", TenantId = 1 },
-    new User { FirstName = "Jane", LastName = "Smith", Email = "jane.smith@example.com", TenantId = 1 });
+    new User { FirstName = "Jane", LastName = "Smith", Email = "jane.smith@example.com", TenantId = 1 }
+);
 ```
 
-Typical EF `SaveChangesAsync` shape:
+Typical Entity Framework `SaveChangesAsync()` would result in the following SQL:
 
 ```sql
 INSERT INTO "users" ("email", "first_name", "last_name", "tenant_id")
@@ -82,7 +73,7 @@ VALUES (@p4, @p5, @p6, @p7)
 RETURNING "id";
 ```
 
-Bulk shape:
+`BulkSaveChangesAsync()` results in the following SQL:
 
 ```sql
 INSERT INTO "users" ("email", "first_name", "last_name", "tenant_id")
@@ -97,7 +88,7 @@ users[0].FirstName = "Johnny";
 users[1].Email = "jane.updated@example.com";
 ```
 
-Typical EF `SaveChangesAsync` shape:
+Typical Entity Framework `SaveChangesAsync()` would result in the following SQL:
 
 ```sql
 UPDATE "users"
@@ -109,7 +100,7 @@ SET "email" = @p2
 WHERE "id" = @p3;
 ```
 
-Bulk shape:
+`BulkSaveChangesAsync()` results in the following SQL:
 
 ```sql
 WITH source("id", "email", "first_name", "last_name", "tenant_id") AS (
@@ -124,15 +115,13 @@ FROM source
 WHERE target."id" = source."id";
 ```
 
-For modified rows, the bulk update writes all normal updatable scalar columns, not only the specific properties EF marked modified. That keeps the SQL simple and lets one command update many rows.
-
 ### Delete
 
 ```csharp
 db.Users.RemoveRange(usersToDelete);
 ```
 
-Typical EF `SaveChangesAsync` shape:
+Typical Entity Framework `SaveChangesAsync()` would result in the following SQL:
 
 ```sql
 DELETE FROM "users"
@@ -142,7 +131,7 @@ DELETE FROM "users"
 WHERE "id" = @p1;
 ```
 
-Bulk shape:
+`BulkSaveChangesAsync()` results in the following SQL:
 
 ```sql
 DELETE FROM "users" WHERE "id" IN (@p0, @p1);
@@ -172,8 +161,6 @@ await db.BulkSynchronizeAsync(usersFromTenant, options =>
 });
 ```
 
-All source rows must have the same value for each delete scope property.
-
 ## Support
 
 Supported:
@@ -184,8 +171,6 @@ Supported:
 - Tracked `Added`, `Modified`, and `Deleted` entries
 - Database-generated keys on insert via `RETURNING`
 - `BulkSynchronizeAsync` source-list insert/update with opt-in delete-missing behavior
-
-For high-volume CockroachDB inserts, prefer app-assigned keys or CockroachDB `DEFAULT unique_rowid()` primary keys mapped to a .NET `long`. The library still supports generated keys through `RETURNING`, but CockroachDB `INT GENERATED ... AS IDENTITY` is a poor fit for bulk insert throughput in local manual testing.
 
 Not supported:
 
@@ -208,13 +193,14 @@ The tests assert generated SQL and parameter values without requiring a running 
 
 ## SQLite, PostgreSQL, and CockroachDB Performance Results
 
-These results come from `BulkSaveChangesPerformanceTests` using SQLite in-memory databases, `BulkSaveChangesPostgreSqlPerformanceTests` using a Docker-hosted PostgreSQL 16 container, and `BulkSaveChangesCockroachDbPerformanceTests` using a Docker-hosted CockroachDB v26.2.1 single-node cluster on a local development machine. The 100,000-row-and-above performance cases are disabled for the Docker-hosted database suites to keep smoke-test runtime practical. The CockroachDB performance schema uses `DEFAULT unique_rowid()` keys mapped to .NET `long` values, and each CockroachDB measurement reports the median of three iterations. The PostgreSQL and CockroachDB performance suites start throwaway containers and remove them after the run. Timings are smoke-test measurements, not BenchmarkDotNet results. Insert, update, and mixed measurements time only the save call after entities have been staged in the change tracker. Synchronize measurements time the full synchronize operation: the manual `SaveChanges` path loads matching rows, applies source values, deletes missing rows, adds new rows, and saves; the `BulkSynchronize` path runs `BulkSynchronizeAsync` over the same source shape.
-
-### CockroachDB Outcome Summary
-
-The CockroachDB-focused update change replaces `UNION ALL` update sources with a `VALUES` CTE, and the CockroachDB performance schema now matches a production-friendly `DEFAULT unique_rowid()` key shape. With a single-node CockroachDB cluster, larger batches reduce round trips substantially across inserts, updates, mixed changes, and synchronization. At 10,000 rows, bulk inserts with batch 10,000 completed in a median 110.24 ms versus 1,668.49 ms for `SaveChanges`; 10,000-row updates reached 174.77 ms at batch 5,000 versus 2,824.35 ms; mixed changes reached 125.13 ms at batch 5,000 versus 2,012.80 ms; and synchronize reached 272.56 ms at batch 5,000 versus 3,125.55 ms.
-
 ![BulkSaveChanges performance chart](docs/performance-results.svg)
+
+All tests performned on a development machine
+SQLite: using in-memory databases
+PostgreSQL: Docker v16 container
+CockroachDB: Docker v26.2.1 single-node cluster
+
+Timing are medidan of 3 runs
 
 ### Insert
 

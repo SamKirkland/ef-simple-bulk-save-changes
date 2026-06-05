@@ -30,6 +30,12 @@ public sealed class BulkSaveChangesPerformanceTests
         await db.BulkSaveChangesAsync(batchSize: 100);
     }
 
+    [ClassCleanup]
+    public static void RegeneratePerformanceChart()
+    {
+        PerformanceReadmeUpdater.RegenerateChart();
+    }
+
     [TestMethod]
     public async Task Inserts_PerformanceAcrossSaveChangesAndBulkBatchSizes()
     {
@@ -289,6 +295,14 @@ public sealed class BulkSaveChangesPerformanceTests
             $"{scenario}, {method}, {rowCount}, {batchSize?.ToString() ?? "n/a"}, {saveStopwatch.Elapsed.TotalMilliseconds:F2}, {speedup}");
         TestContext.WriteLine(
             $"VERBOSE {scenario}, {method}, {rowCount}, {batchSize?.ToString() ?? "n/a"}, {fixtureStopwatch.Elapsed.TotalMilliseconds:F2}, {arrangeStopwatch.Elapsed.TotalMilliseconds:F2}, {saveStopwatch.Elapsed.TotalMilliseconds:F2}, {verifyStopwatch.Elapsed.TotalMilliseconds:F2}, {totalStopwatch.Elapsed.TotalMilliseconds:F2}, {expectedSavedCount}, {savedCount}");
+        PerformanceReadmeUpdater.Record(
+            "SQLite",
+            scenario,
+            method,
+            rowCount,
+            batchSize,
+            saveStopwatch.Elapsed.TotalMilliseconds,
+            speedup);
 
         return new PerformanceMeasurement(
             fixtureStopwatch.Elapsed.TotalMilliseconds,

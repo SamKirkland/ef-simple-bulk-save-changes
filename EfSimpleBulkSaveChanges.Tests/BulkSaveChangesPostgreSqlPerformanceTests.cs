@@ -51,6 +51,8 @@ public sealed class BulkSaveChangesPostgreSqlPerformanceTests
         {
             await Server.DisposeAsync();
         }
+
+        PerformanceReadmeUpdater.RegenerateChart();
     }
 
     [TestMethod]
@@ -465,6 +467,14 @@ public sealed class BulkSaveChangesPostgreSqlPerformanceTests
             $"PostgreSQL, {scenario}, {method}, {rowCount}, {batchSize?.ToString() ?? "n/a"}, {saveStopwatch.Elapsed.TotalMilliseconds:F2}, {speedup}");
         TestContext.WriteLine(
             $"VERBOSE PostgreSQL, {scenario}, {method}, {rowCount}, {batchSize?.ToString() ?? "n/a"}, {fixtureStopwatch.Elapsed.TotalMilliseconds:F2}, {arrangeStopwatch.Elapsed.TotalMilliseconds:F2}, {saveStopwatch.Elapsed.TotalMilliseconds:F2}, {verifyStopwatch.Elapsed.TotalMilliseconds:F2}, {totalStopwatch.Elapsed.TotalMilliseconds:F2}, {expectedSavedCount}, {savedCount}");
+        PerformanceReadmeUpdater.Record(
+            "PostgreSQL",
+            scenario,
+            method,
+            rowCount,
+            batchSize,
+            saveStopwatch.Elapsed.TotalMilliseconds,
+            speedup);
 
         return new PerformanceMeasurement(saveStopwatch.Elapsed.TotalMilliseconds);
     }

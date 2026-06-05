@@ -51,6 +51,8 @@ public sealed class BulkSaveChangesCockroachDbPerformanceTests
         {
             await Server.DisposeAsync();
         }
+
+        PerformanceReadmeUpdater.RegenerateChart();
     }
 
     [TestMethod]
@@ -339,6 +341,14 @@ public sealed class BulkSaveChangesCockroachDbPerformanceTests
 
         TestContext.WriteLine(
             $"CockroachDB, {scenario}, {method}, {rowCount}, {batchSize?.ToString() ?? "n/a"}, {medianSaveMilliseconds:F2}, {speedup}");
+        PerformanceReadmeUpdater.Record(
+            "CockroachDB",
+            scenario,
+            method,
+            rowCount,
+            batchSize,
+            medianSaveMilliseconds,
+            speedup);
 
         return new PerformanceMeasurement(medianSaveMilliseconds);
     }
