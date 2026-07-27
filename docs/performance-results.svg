@@ -52,87 +52,87 @@
   <line x1="104" y1="132" x2="1036" y2="132" class="subsection-rule"/>
   <text x="166" y="171" class="method-heading" text-anchor="end">SaveChanges</text>
   <rect x="176" y="146" width="48" height="12" rx="2" fill="#2374ab"/>
-  <text x="232" y="156" class="value" text-anchor="start">1.00x (0.21 ms)</text>
+  <text x="232" y="156" class="value" text-anchor="start">1.00x (0.15 ms)</text>
   <rect x="176" y="161" width="48" height="12" rx="2" fill="#2f855a"/>
-  <text x="232" y="171" class="value" text-anchor="start">1.00x (1.12 ms)</text>
+  <text x="232" y="171" class="value" text-anchor="start">1.00x (1.54 ms)</text>
   <rect x="176" y="176" width="48" height="12" rx="2" fill="#7c3aed"/>
-  <text x="232" y="186" class="value" text-anchor="start">1.00x (4.70 ms)</text>
+  <text x="232" y="186" class="value" text-anchor="start">1.00x (5.21 ms)</text>
   <text x="166" y="223" class="method-heading" text-anchor="end">BulkSaveChanges</text>
-  <rect x="176" y="198" width="20" height="12" rx="2" fill="#2374ab"/>
-  <text x="204" y="208" class="value" text-anchor="start">0.42x (0.50 ms)</text>
-  <rect x="176" y="213" width="36" height="12" rx="2" fill="#2f855a"/>
-  <text x="220" y="223" class="value" text-anchor="start">0.75x (1.50 ms)</text>
-  <rect x="176" y="228" width="40" height="12" rx="2" fill="#7c3aed"/>
-  <text x="224" y="238" class="value" text-anchor="start">0.84x (5.62 ms)</text>
+  <rect x="176" y="198" width="41" height="12" rx="2" fill="#2374ab"/>
+  <text x="225" y="208" class="value" text-anchor="start">0.85x (0.17 ms)</text>
+  <rect x="176" y="213" width="31" height="12" rx="2" fill="#2f855a"/>
+  <text x="215" y="223" class="value" text-anchor="start">0.65x (2.38 ms)</text>
+  <rect x="176" y="228" width="45" height="12" rx="2" fill="#7c3aed"/>
+  <text x="229" y="238" class="value" text-anchor="start">0.94x (5.52 ms)</text>
   <text x="24" y="273" class="row-count">100 rows</text>
   <line x1="104" y1="268" x2="1036" y2="268" class="subsection-rule"/>
   <text x="166" y="307" class="method-heading" text-anchor="end">SaveChanges</text>
   <rect x="176" y="282" width="48" height="12" rx="2" fill="#2374ab"/>
-  <text x="232" y="292" class="value" text-anchor="start">1.00x (1.61 ms)</text>
+  <text x="232" y="292" class="value" text-anchor="start">1.00x (1.81 ms)</text>
   <rect x="176" y="297" width="48" height="12" rx="2" fill="#2f855a"/>
-  <text x="232" y="307" class="value" text-anchor="start">1.00x (3.95 ms)</text>
+  <text x="232" y="307" class="value" text-anchor="start">1.00x (4.47 ms)</text>
   <rect x="176" y="312" width="48" height="12" rx="2" fill="#7c3aed"/>
-  <text x="232" y="322" class="value" text-anchor="start">1.00x (25.00 ms)</text>
+  <text x="232" y="322" class="value" text-anchor="start">1.00x (29.50 ms)</text>
   <text x="166" y="359" class="method-heading" text-anchor="end">batch 100</text>
-  <rect x="176" y="334" width="118" height="12" rx="2" fill="#2374ab"/>
-  <text x="302" y="344" class="value" text-anchor="start">2.48x (0.65 ms)</text>
-  <rect x="176" y="349" width="101" height="12" rx="2" fill="#2f855a"/>
-  <text x="285" y="359" class="value" text-anchor="start">2.12x (1.86 ms)</text>
-  <rect x="176" y="364" width="203" height="12" rx="2" fill="#7c3aed"/>
-  <text x="387" y="374" class="value" text-anchor="start">4.25x (5.88 ms)</text>
+  <rect x="176" y="334" width="115" height="12" rx="2" fill="#2374ab"/>
+  <text x="299" y="344" class="value" text-anchor="start">2.41x (0.75 ms)</text>
+  <rect x="176" y="349" width="85" height="12" rx="2" fill="#2f855a"/>
+  <text x="269" y="359" class="value" text-anchor="start">1.78x (2.52 ms)</text>
+  <rect x="176" y="364" width="240" height="12" rx="2" fill="#7c3aed"/>
+  <text x="424" y="374" class="value" text-anchor="start">5.03x (5.86 ms)</text>
   <text x="24" y="409" class="row-count">1,000 rows</text>
   <line x1="104" y1="404" x2="1036" y2="404" class="subsection-rule"/>
   <text x="166" y="443" class="method-heading" text-anchor="end">SaveChanges</text>
   <rect x="176" y="418" width="48" height="12" rx="2" fill="#2374ab"/>
-  <text x="232" y="428" class="value" text-anchor="start">1.00x (12.68 ms)</text>
+  <text x="232" y="428" class="value" text-anchor="start">1.00x (19.37 ms)</text>
   <rect x="176" y="433" width="48" height="12" rx="2" fill="#2f855a"/>
-  <text x="232" y="443" class="value" text-anchor="start">1.00x (24.39 ms)</text>
+  <text x="232" y="443" class="value" text-anchor="start">1.00x (25.57 ms)</text>
   <rect x="176" y="448" width="48" height="12" rx="2" fill="#7c3aed"/>
-  <text x="232" y="458" class="value" text-anchor="start">1.00x (169.65 ms)</text>
+  <text x="232" y="458" class="value" text-anchor="start">1.00x (163.91 ms)</text>
   <text x="166" y="495" class="method-heading" text-anchor="end">batch 100</text>
-  <rect x="176" y="470" width="115" height="12" rx="2" fill="#2374ab"/>
-  <text x="299" y="480" class="value" text-anchor="start">2.40x (5.28 ms)</text>
-  <rect x="176" y="485" width="67" height="12" rx="2" fill="#2f855a"/>
-  <text x="251" y="495" class="value" text-anchor="start">1.40x (17.44 ms)</text>
-  <rect x="176" y="500" width="330" height="12" rx="2" fill="#7c3aed"/>
-  <text x="514" y="510" class="value" text-anchor="start">6.91x (24.54 ms)</text>
+  <rect x="176" y="470" width="142" height="12" rx="2" fill="#2374ab"/>
+  <text x="326" y="480" class="value" text-anchor="start">2.97x (6.52 ms)</text>
+  <rect x="176" y="485" width="111" height="12" rx="2" fill="#2f855a"/>
+  <text x="295" y="495" class="value" text-anchor="start">2.32x (11.03 ms)</text>
+  <rect x="176" y="500" width="335" height="12" rx="2" fill="#7c3aed"/>
+  <text x="519" y="510" class="value" text-anchor="start">7.01x (23.39 ms)</text>
   <text x="166" y="547" class="method-heading" text-anchor="end">batch 1,000</text>
-  <rect x="176" y="522" width="30" height="12" rx="2" fill="#2374ab"/>
-  <text x="214" y="532" class="value" text-anchor="start">0.63x (20.21 ms)</text>
-  <rect x="176" y="537" width="191" height="12" rx="2" fill="#2f855a"/>
-  <text x="375" y="547" class="value" text-anchor="start">4.00x (6.09 ms)</text>
-  <rect x="176" y="552" width="516" height="12" rx="2" fill="#7c3aed"/>
-  <text x="700" y="562" class="value" text-anchor="start">10.80x (15.70 ms)</text>
+  <rect x="176" y="522" width="45" height="12" rx="2" fill="#2374ab"/>
+  <text x="229" y="532" class="value" text-anchor="start">0.94x (20.64 ms)</text>
+  <rect x="176" y="537" width="111" height="12" rx="2" fill="#2f855a"/>
+  <text x="295" y="547" class="value" text-anchor="start">2.33x (10.97 ms)</text>
+  <rect x="176" y="552" width="473" height="12" rx="2" fill="#7c3aed"/>
+  <text x="657" y="562" class="value" text-anchor="start">9.90x (16.56 ms)</text>
   <text x="24" y="597" class="row-count">10,000 rows</text>
   <line x1="104" y1="592" x2="1036" y2="592" class="subsection-rule"/>
   <text x="166" y="631" class="method-heading" text-anchor="end">SaveChanges</text>
   <rect x="176" y="606" width="48" height="12" rx="2" fill="#2374ab"/>
-  <text x="232" y="616" class="value" text-anchor="start">1.00x (159.19 ms)</text>
+  <text x="232" y="616" class="value" text-anchor="start">1.00x (199.88 ms)</text>
   <rect x="176" y="621" width="48" height="12" rx="2" fill="#2f855a"/>
-  <text x="232" y="631" class="value" text-anchor="start">1.00x (267.23 ms)</text>
+  <text x="232" y="631" class="value" text-anchor="start">1.00x (287.07 ms)</text>
   <rect x="176" y="636" width="48" height="12" rx="2" fill="#7c3aed"/>
-  <text x="232" y="646" class="value" text-anchor="start">1.00x (1,668.49 ms)</text>
+  <text x="232" y="646" class="value" text-anchor="start">1.00x (1,681.52 ms)</text>
   <text x="166" y="683" class="method-heading" text-anchor="end">batch 100</text>
-  <rect x="176" y="658" width="107" height="12" rx="2" fill="#2374ab"/>
-  <text x="291" y="668" class="value" text-anchor="start">2.24x (71.06 ms)</text>
-  <rect x="176" y="673" width="129" height="12" rx="2" fill="#2f855a"/>
-  <text x="313" y="683" class="value" text-anchor="start">2.69x (99.33 ms)</text>
-  <rect x="176" y="688" width="450" height="12" rx="2" fill="#7c3aed"/>
-  <text x="634" y="698" class="value" text-anchor="start">9.41x (177.35 ms)</text>
+  <rect x="176" y="658" width="66" height="12" rx="2" fill="#2374ab"/>
+  <text x="250" y="668" class="value" text-anchor="start">1.38x (144.46 ms)</text>
+  <rect x="176" y="673" width="127" height="12" rx="2" fill="#2f855a"/>
+  <text x="311" y="683" class="value" text-anchor="start">2.66x (107.85 ms)</text>
+  <rect x="176" y="688" width="381" height="12" rx="2" fill="#7c3aed"/>
+  <text x="565" y="698" class="value" text-anchor="start">7.97x (211.08 ms)</text>
   <text x="166" y="735" class="method-heading" text-anchor="end">batch 1,000</text>
-  <rect x="176" y="710" width="32" height="12" rx="2" fill="#2374ab"/>
-  <text x="216" y="720" class="value" text-anchor="start">0.67x (236.60 ms)</text>
-  <rect x="176" y="725" width="168" height="12" rx="2" fill="#2f855a"/>
-  <text x="352" y="735" class="value" text-anchor="start">3.52x (75.84 ms)</text>
-  <rect x="176" y="740" width="641" height="12" rx="2" fill="#7c3aed"/>
-  <text x="825" y="750" class="value" text-anchor="start">13.42x (124.34 ms)</text>
+  <rect x="176" y="710" width="44" height="12" rx="2" fill="#2374ab"/>
+  <text x="228" y="720" class="value" text-anchor="start">0.92x (217.28 ms)</text>
+  <rect x="176" y="725" width="184" height="12" rx="2" fill="#2f855a"/>
+  <text x="368" y="735" class="value" text-anchor="start">3.86x (74.39 ms)</text>
+  <rect x="176" y="740" width="540" height="12" rx="2" fill="#7c3aed"/>
+  <text x="724" y="750" class="value" text-anchor="start">11.31x (148.72 ms)</text>
   <text x="166" y="787" class="method-heading" text-anchor="end">batch 10,000</text>
   <rect x="176" y="762" width="5" height="12" rx="2" fill="#2374ab"/>
-  <text x="189" y="772" class="value" text-anchor="start">0.10x (1,662.23 ms)</text>
-  <rect x="176" y="777" width="228" height="12" rx="2" fill="#2f855a"/>
-  <text x="412" y="787" class="value" text-anchor="start">4.77x (56.07 ms)</text>
-  <rect x="176" y="792" width="723" height="12" rx="2" fill="#7c3aed"/>
-  <text x="907" y="802" class="value" text-anchor="start">15.14x (110.24 ms)</text>
+  <text x="189" y="772" class="value" text-anchor="start">0.11x (1,739.02 ms)</text>
+  <rect x="176" y="777" width="216" height="12" rx="2" fill="#2f855a"/>
+  <text x="400" y="787" class="value" text-anchor="start">4.53x (63.35 ms)</text>
+  <rect x="176" y="792" width="640" height="12" rx="2" fill="#7c3aed"/>
+  <text x="824" y="802" class="value" text-anchor="start">13.39x (125.60 ms)</text>
   <line x1="24" y1="832" x2="1036" y2="832" class="subsection-rule"/>
   <text x="24" y="858" class="scenario">Update</text>
   <rect x="682" y="848" width="10" height="10" rx="2" fill="#2374ab"/>
@@ -145,92 +145,92 @@
   <line x1="104" y1="890" x2="1036" y2="890" class="subsection-rule"/>
   <text x="166" y="929" class="method-heading" text-anchor="end">SaveChanges</text>
   <rect x="176" y="904" width="48" height="12" rx="2" fill="#2374ab"/>
-  <text x="232" y="914" class="value" text-anchor="start">1.00x (1.02 ms)</text>
+  <text x="232" y="914" class="value" text-anchor="start">1.00x (0.93 ms)</text>
   <rect x="176" y="919" width="48" height="12" rx="2" fill="#2f855a"/>
-  <text x="232" y="929" class="value" text-anchor="start">1.00x (1.08 ms)</text>
+  <text x="232" y="929" class="value" text-anchor="start">1.00x (1.18 ms)</text>
   <rect x="176" y="934" width="48" height="12" rx="2" fill="#7c3aed"/>
-  <text x="232" y="944" class="value" text-anchor="start">1.00x (2.17 ms)</text>
+  <text x="232" y="944" class="value" text-anchor="start">1.00x (4.65 ms)</text>
   <text x="166" y="981" class="method-heading" text-anchor="end">BulkSaveChanges</text>
-  <rect x="176" y="956" width="490" height="12" rx="2" fill="#2374ab"/>
-  <text x="674" y="966" class="value" text-anchor="start">10.26x (0.10 ms)</text>
-  <rect x="176" y="971" width="44" height="12" rx="2" fill="#2f855a"/>
-  <text x="228" y="981" class="value" text-anchor="start">0.92x (1.16 ms)</text>
-  <rect x="176" y="986" width="37" height="12" rx="2" fill="#7c3aed"/>
-  <text x="221" y="996" class="value" text-anchor="start">0.78x (2.79 ms)</text>
+  <rect x="176" y="956" width="275" height="12" rx="2" fill="#2374ab"/>
+  <text x="459" y="966" class="value" text-anchor="start">5.76x (0.16 ms)</text>
+  <rect x="176" y="971" width="41" height="12" rx="2" fill="#2f855a"/>
+  <text x="225" y="981" class="value" text-anchor="start">0.85x (1.38 ms)</text>
+  <rect x="176" y="986" width="80" height="12" rx="2" fill="#7c3aed"/>
+  <text x="264" y="996" class="value" text-anchor="start">1.67x (2.78 ms)</text>
   <text x="24" y="1031" class="row-count">100 rows</text>
   <line x1="104" y1="1026" x2="1036" y2="1026" class="subsection-rule"/>
   <text x="166" y="1065" class="method-heading" text-anchor="end">SaveChanges</text>
   <rect x="176" y="1040" width="48" height="12" rx="2" fill="#2374ab"/>
-  <text x="232" y="1050" class="value" text-anchor="start">1.00x (1.00 ms)</text>
+  <text x="232" y="1050" class="value" text-anchor="start">1.00x (1.44 ms)</text>
   <rect x="176" y="1055" width="48" height="12" rx="2" fill="#2f855a"/>
-  <text x="232" y="1065" class="value" text-anchor="start">1.00x (3.53 ms)</text>
+  <text x="232" y="1065" class="value" text-anchor="start">1.00x (3.72 ms)</text>
   <rect x="176" y="1070" width="48" height="12" rx="2" fill="#7c3aed"/>
-  <text x="232" y="1080" class="value" text-anchor="start">1.00x (30.65 ms)</text>
+  <text x="232" y="1080" class="value" text-anchor="start">1.00x (31.04 ms)</text>
   <text x="166" y="1117" class="method-heading" text-anchor="end">batch 100</text>
-  <rect x="176" y="1092" width="59" height="12" rx="2" fill="#2374ab"/>
-  <text x="243" y="1102" class="value" text-anchor="start">1.23x (0.82 ms)</text>
-  <rect x="176" y="1107" width="17" height="12" rx="2" fill="#2f855a"/>
-  <text x="201" y="1117" class="value" text-anchor="start">0.35x (10.13 ms)</text>
-  <rect x="176" y="1122" width="321" height="12" rx="2" fill="#7c3aed"/>
-  <text x="505" y="1132" class="value" text-anchor="start">6.71x (4.57 ms)</text>
+  <rect x="176" y="1092" width="70" height="12" rx="2" fill="#2374ab"/>
+  <text x="254" y="1102" class="value" text-anchor="start">1.47x (0.98 ms)</text>
+  <rect x="176" y="1107" width="21" height="12" rx="2" fill="#2f855a"/>
+  <text x="205" y="1117" class="value" text-anchor="start">0.44x (8.42 ms)</text>
+  <rect x="176" y="1122" width="337" height="12" rx="2" fill="#7c3aed"/>
+  <text x="521" y="1132" class="value" text-anchor="start">7.06x (4.40 ms)</text>
   <text x="24" y="1167" class="row-count">1,000 rows</text>
   <line x1="104" y1="1162" x2="1036" y2="1162" class="subsection-rule"/>
   <text x="166" y="1201" class="method-heading" text-anchor="end">SaveChanges</text>
   <rect x="176" y="1176" width="48" height="12" rx="2" fill="#2374ab"/>
-  <text x="232" y="1186" class="value" text-anchor="start">1.00x (9.73 ms)</text>
+  <text x="232" y="1186" class="value" text-anchor="start">1.00x (12.52 ms)</text>
   <rect x="176" y="1191" width="48" height="12" rx="2" fill="#2f855a"/>
-  <text x="232" y="1201" class="value" text-anchor="start">1.00x (27.10 ms)</text>
+  <text x="232" y="1201" class="value" text-anchor="start">1.00x (26.92 ms)</text>
   <rect x="176" y="1206" width="48" height="12" rx="2" fill="#7c3aed"/>
-  <text x="232" y="1216" class="value" text-anchor="start">1.00x (283.34 ms)</text>
+  <text x="232" y="1216" class="value" text-anchor="start">1.00x (282.71 ms)</text>
   <text x="166" y="1253" class="method-heading" text-anchor="end">batch 100</text>
-  <rect x="176" y="1228" width="67" height="12" rx="2" fill="#2374ab"/>
-  <text x="251" y="1238" class="value" text-anchor="start">1.40x (6.97 ms)</text>
-  <rect x="176" y="1243" width="105" height="12" rx="2" fill="#2f855a"/>
-  <text x="289" y="1253" class="value" text-anchor="start">2.20x (12.32 ms)</text>
-  <rect x="176" y="1258" width="509" height="12" rx="2" fill="#7c3aed"/>
-  <text x="693" y="1268" class="value" text-anchor="start">10.65x (26.60 ms)</text>
+  <rect x="176" y="1228" width="80" height="12" rx="2" fill="#2374ab"/>
+  <text x="264" y="1238" class="value" text-anchor="start">1.67x (7.48 ms)</text>
+  <rect x="176" y="1243" width="100" height="12" rx="2" fill="#2f855a"/>
+  <text x="284" y="1253" class="value" text-anchor="start">2.09x (12.86 ms)</text>
+  <rect x="176" y="1258" width="474" height="12" rx="2" fill="#7c3aed"/>
+  <text x="658" y="1268" class="value" text-anchor="start">9.93x (28.47 ms)</text>
   <text x="166" y="1305" class="method-heading" text-anchor="end">batch 250</text>
-  <rect x="176" y="1280" width="39" height="12" rx="2" fill="#2374ab"/>
-  <text x="223" y="1290" class="value" text-anchor="start">0.82x (11.87 ms)</text>
-  <rect x="176" y="1295" width="105" height="12" rx="2" fill="#2f855a"/>
-  <text x="289" y="1305" class="value" text-anchor="start">2.19x (12.39 ms)</text>
-  <rect x="176" y="1310" width="536" height="12" rx="2" fill="#7c3aed"/>
-  <text x="720" y="1320" class="value" text-anchor="start">11.21x (25.28 ms)</text>
+  <rect x="176" y="1280" width="50" height="12" rx="2" fill="#2374ab"/>
+  <text x="234" y="1290" class="value" text-anchor="start">1.05x (11.95 ms)</text>
+  <rect x="176" y="1295" width="132" height="12" rx="2" fill="#2f855a"/>
+  <text x="316" y="1305" class="value" text-anchor="start">2.76x (9.76 ms)</text>
+  <rect x="176" y="1310" width="525" height="12" rx="2" fill="#7c3aed"/>
+  <text x="709" y="1320" class="value" text-anchor="start">10.98x (25.76 ms)</text>
   <text x="166" y="1342" class="method-heading" text-anchor="end">batch 1,000</text>
-  <rect x="176" y="1332" width="736" height="12" rx="2" fill="#7c3aed"/>
-  <text x="920" y="1342" class="value" text-anchor="start">15.40x (18.39 ms)</text>
+  <rect x="176" y="1332" width="740" height="12" rx="2" fill="#7c3aed"/>
+  <text x="924" y="1342" class="value" text-anchor="start">15.49x (18.25 ms)</text>
   <text x="166" y="1364" class="method-heading" text-anchor="end">batch 5,000</text>
-  <rect x="176" y="1354" width="740" height="12" rx="2" fill="#7c3aed"/>
-  <text x="924" y="1364" class="value" text-anchor="start">15.48x (18.31 ms)</text>
+  <rect x="176" y="1354" width="735" height="12" rx="2" fill="#7c3aed"/>
+  <text x="919" y="1364" class="value" text-anchor="start">15.38x (18.39 ms)</text>
   <text x="24" y="1399" class="row-count">10,000 rows</text>
   <line x1="104" y1="1394" x2="1036" y2="1394" class="subsection-rule"/>
   <text x="166" y="1433" class="method-heading" text-anchor="end">SaveChanges</text>
   <rect x="176" y="1408" width="48" height="12" rx="2" fill="#2374ab"/>
-  <text x="232" y="1418" class="value" text-anchor="start">1.00x (145.81 ms)</text>
+  <text x="232" y="1418" class="value" text-anchor="start">1.00x (179.13 ms)</text>
   <rect x="176" y="1423" width="48" height="12" rx="2" fill="#2f855a"/>
-  <text x="232" y="1433" class="value" text-anchor="start">1.00x (281.13 ms)</text>
+  <text x="232" y="1433" class="value" text-anchor="start">1.00x (302.04 ms)</text>
   <rect x="176" y="1438" width="48" height="12" rx="2" fill="#7c3aed"/>
-  <text x="232" y="1448" class="value" text-anchor="start">1.00x (2,824.35 ms)</text>
+  <text x="232" y="1448" class="value" text-anchor="start">1.00x (2,860.20 ms)</text>
   <text x="166" y="1485" class="method-heading" text-anchor="end">batch 100</text>
-  <rect x="176" y="1460" width="82" height="12" rx="2" fill="#2374ab"/>
-  <text x="266" y="1470" class="value" text-anchor="start">1.71x (85.36 ms)</text>
-  <rect x="176" y="1475" width="77" height="12" rx="2" fill="#2f855a"/>
-  <text x="261" y="1485" class="value" text-anchor="start">1.61x (174.28 ms)</text>
-  <rect x="176" y="1490" width="505" height="12" rx="2" fill="#7c3aed"/>
-  <text x="689" y="1500" class="value" text-anchor="start">10.58x (267.05 ms)</text>
+  <rect x="176" y="1460" width="80" height="12" rx="2" fill="#2374ab"/>
+  <text x="264" y="1470" class="value" text-anchor="start">1.68x (106.41 ms)</text>
+  <rect x="176" y="1475" width="79" height="12" rx="2" fill="#2f855a"/>
+  <text x="263" y="1485" class="value" text-anchor="start">1.65x (183.07 ms)</text>
+  <rect x="176" y="1490" width="498" height="12" rx="2" fill="#7c3aed"/>
+  <text x="682" y="1500" class="value" text-anchor="start">10.43x (274.18 ms)</text>
   <text x="166" y="1537" class="method-heading" text-anchor="end">batch 250</text>
-  <rect x="176" y="1512" width="50" height="12" rx="2" fill="#2374ab"/>
-  <text x="234" y="1522" class="value" text-anchor="start">1.05x (139.40 ms)</text>
-  <rect x="176" y="1527" width="117" height="12" rx="2" fill="#2f855a"/>
-  <text x="301" y="1537" class="value" text-anchor="start">2.45x (114.87 ms)</text>
-  <rect x="176" y="1542" width="554" height="12" rx="2" fill="#7c3aed"/>
-  <text x="738" y="1552" class="value" text-anchor="start">11.59x (243.64 ms)</text>
+  <rect x="176" y="1512" width="59" height="12" rx="2" fill="#2374ab"/>
+  <text x="243" y="1522" class="value" text-anchor="start">1.23x (146.04 ms)</text>
+  <rect x="176" y="1527" width="118" height="12" rx="2" fill="#2f855a"/>
+  <text x="302" y="1537" class="value" text-anchor="start">2.48x (121.89 ms)</text>
+  <rect x="176" y="1542" width="545" height="12" rx="2" fill="#7c3aed"/>
+  <text x="729" y="1552" class="value" text-anchor="start">11.41x (250.67 ms)</text>
   <text x="166" y="1574" class="method-heading" text-anchor="end">batch 1,000</text>
-  <rect x="176" y="1564" width="703" height="12" rx="2" fill="#7c3aed"/>
-  <text x="887" y="1574" class="value" text-anchor="start">14.71x (191.98 ms)</text>
+  <rect x="176" y="1564" width="655" height="12" rx="2" fill="#7c3aed"/>
+  <text x="839" y="1574" class="value" text-anchor="start">13.71x (208.55 ms)</text>
   <text x="166" y="1596" class="method-heading" text-anchor="end">batch 5,000</text>
-  <rect x="176" y="1586" width="772" height="12" rx="2" fill="#7c3aed"/>
-  <text x="940" y="1596" class="value-inside" text-anchor="end">16.16x (174.77 ms)</text>
+  <rect x="176" y="1586" width="765" height="12" rx="2" fill="#7c3aed"/>
+  <text x="933" y="1596" class="value-inside" text-anchor="end">16.01x (178.70 ms)</text>
   <line x1="24" y1="1626" x2="1036" y2="1626" class="subsection-rule"/>
   <text x="24" y="1652" class="scenario">Mixed Add/Update/Delete</text>
   <rect x="682" y="1642" width="10" height="10" rx="2" fill="#2374ab"/>
@@ -245,89 +245,89 @@
   <rect x="176" y="1698" width="48" height="12" rx="2" fill="#2374ab"/>
   <text x="232" y="1708" class="value" text-anchor="start">1.00x (0.07 ms)</text>
   <rect x="176" y="1713" width="48" height="12" rx="2" fill="#2f855a"/>
-  <text x="232" y="1723" class="value" text-anchor="start">1.00x (0.97 ms)</text>
+  <text x="232" y="1723" class="value" text-anchor="start">1.00x (1.01 ms)</text>
   <rect x="176" y="1728" width="48" height="12" rx="2" fill="#7c3aed"/>
-  <text x="232" y="1738" class="value" text-anchor="start">1.00x (1.87 ms)</text>
+  <text x="232" y="1738" class="value" text-anchor="start">1.00x (2.01 ms)</text>
   <text x="166" y="1775" class="method-heading" text-anchor="end">BulkSaveChanges</text>
-  <rect x="176" y="1750" width="38" height="12" rx="2" fill="#2374ab"/>
-  <text x="222" y="1760" class="value" text-anchor="start">0.80x (0.09 ms)</text>
-  <rect x="176" y="1765" width="39" height="12" rx="2" fill="#2f855a"/>
-  <text x="223" y="1775" class="value" text-anchor="start">0.81x (1.19 ms)</text>
-  <rect x="176" y="1780" width="32" height="12" rx="2" fill="#7c3aed"/>
-  <text x="216" y="1790" class="value" text-anchor="start">0.67x (2.78 ms)</text>
+  <rect x="176" y="1750" width="29" height="12" rx="2" fill="#2374ab"/>
+  <text x="213" y="1760" class="value" text-anchor="start">0.61x (0.11 ms)</text>
+  <rect x="176" y="1765" width="30" height="12" rx="2" fill="#2f855a"/>
+  <text x="214" y="1775" class="value" text-anchor="start">0.62x (1.63 ms)</text>
+  <rect x="176" y="1780" width="38" height="12" rx="2" fill="#7c3aed"/>
+  <text x="222" y="1790" class="value" text-anchor="start">0.79x (2.53 ms)</text>
   <text x="24" y="1825" class="row-count">100 rows</text>
   <line x1="104" y1="1820" x2="1036" y2="1820" class="subsection-rule"/>
   <text x="166" y="1859" class="method-heading" text-anchor="end">SaveChanges</text>
   <rect x="176" y="1834" width="48" height="12" rx="2" fill="#2374ab"/>
-  <text x="232" y="1844" class="value" text-anchor="start">1.00x (1.37 ms)</text>
+  <text x="232" y="1844" class="value" text-anchor="start">1.00x (1.40 ms)</text>
   <rect x="176" y="1849" width="48" height="12" rx="2" fill="#2f855a"/>
-  <text x="232" y="1859" class="value" text-anchor="start">1.00x (3.64 ms)</text>
+  <text x="232" y="1859" class="value" text-anchor="start">1.00x (3.93 ms)</text>
   <rect x="176" y="1864" width="48" height="12" rx="2" fill="#7c3aed"/>
-  <text x="232" y="1874" class="value" text-anchor="start">1.00x (25.47 ms)</text>
+  <text x="232" y="1874" class="value" text-anchor="start">1.00x (24.35 ms)</text>
   <text x="166" y="1911" class="method-heading" text-anchor="end">batch 100</text>
-  <rect x="176" y="1886" width="155" height="12" rx="2" fill="#2374ab"/>
-  <text x="339" y="1896" class="value" text-anchor="start">3.24x (0.42 ms)</text>
-  <rect x="176" y="1901" width="65" height="12" rx="2" fill="#2f855a"/>
-  <text x="249" y="1911" class="value" text-anchor="start">1.37x (2.66 ms)</text>
-  <rect x="176" y="1916" width="206" height="12" rx="2" fill="#7c3aed"/>
-  <text x="390" y="1926" class="value" text-anchor="start">4.31x (5.91 ms)</text>
+  <rect x="176" y="1886" width="121" height="12" rx="2" fill="#2374ab"/>
+  <text x="305" y="1896" class="value" text-anchor="start">2.53x (0.55 ms)</text>
+  <rect x="176" y="1901" width="62" height="12" rx="2" fill="#2f855a"/>
+  <text x="246" y="1911" class="value" text-anchor="start">1.30x (3.02 ms)</text>
+  <rect x="176" y="1916" width="195" height="12" rx="2" fill="#7c3aed"/>
+  <text x="379" y="1926" class="value" text-anchor="start">4.08x (5.97 ms)</text>
   <text x="24" y="1961" class="row-count">1,000 rows</text>
   <line x1="104" y1="1956" x2="1036" y2="1956" class="subsection-rule"/>
   <text x="166" y="1995" class="method-heading" text-anchor="end">SaveChanges</text>
   <rect x="176" y="1970" width="48" height="12" rx="2" fill="#2374ab"/>
-  <text x="232" y="1980" class="value" text-anchor="start">1.00x (8.73 ms)</text>
+  <text x="232" y="1980" class="value" text-anchor="start">1.00x (9.85 ms)</text>
   <rect x="176" y="1985" width="48" height="12" rx="2" fill="#2f855a"/>
-  <text x="232" y="1995" class="value" text-anchor="start">1.00x (24.77 ms)</text>
+  <text x="232" y="1995" class="value" text-anchor="start">1.00x (27.58 ms)</text>
   <rect x="176" y="2000" width="48" height="12" rx="2" fill="#7c3aed"/>
-  <text x="232" y="2010" class="value" text-anchor="start">1.00x (197.97 ms)</text>
+  <text x="232" y="2010" class="value" text-anchor="start">1.00x (206.13 ms)</text>
   <text x="166" y="2047" class="method-heading" text-anchor="end">batch 100</text>
-  <rect x="176" y="2022" width="93" height="12" rx="2" fill="#2374ab"/>
-  <text x="277" y="2032" class="value" text-anchor="start">1.95x (4.49 ms)</text>
-  <rect x="176" y="2037" width="108" height="12" rx="2" fill="#2f855a"/>
-  <text x="292" y="2047" class="value" text-anchor="start">2.26x (10.94 ms)</text>
-  <rect x="176" y="2052" width="416" height="12" rx="2" fill="#7c3aed"/>
-  <text x="600" y="2062" class="value" text-anchor="start">8.71x (22.74 ms)</text>
+  <rect x="176" y="2022" width="98" height="12" rx="2" fill="#2374ab"/>
+  <text x="282" y="2032" class="value" text-anchor="start">2.05x (4.80 ms)</text>
+  <rect x="176" y="2037" width="118" height="12" rx="2" fill="#2f855a"/>
+  <text x="302" y="2047" class="value" text-anchor="start">2.47x (11.15 ms)</text>
+  <rect x="176" y="2052" width="418" height="12" rx="2" fill="#7c3aed"/>
+  <text x="602" y="2062" class="value" text-anchor="start">8.74x (23.58 ms)</text>
   <text x="166" y="2099" class="method-heading" text-anchor="end">batch 250</text>
-  <rect x="176" y="2074" width="64" height="12" rx="2" fill="#2374ab"/>
-  <text x="248" y="2084" class="value" text-anchor="start">1.34x (6.52 ms)</text>
-  <rect x="176" y="2089" width="141" height="12" rx="2" fill="#2f855a"/>
-  <text x="325" y="2099" class="value" text-anchor="start">2.95x (8.39 ms)</text>
-  <rect x="176" y="2104" width="469" height="12" rx="2" fill="#7c3aed"/>
-  <text x="653" y="2114" class="value" text-anchor="start">9.82x (20.17 ms)</text>
+  <rect x="176" y="2074" width="70" height="12" rx="2" fill="#2374ab"/>
+  <text x="254" y="2084" class="value" text-anchor="start">1.47x (6.70 ms)</text>
+  <rect x="176" y="2089" width="86" height="12" rx="2" fill="#2f855a"/>
+  <text x="270" y="2099" class="value" text-anchor="start">1.79x (15.45 ms)</text>
+  <rect x="176" y="2104" width="476" height="12" rx="2" fill="#7c3aed"/>
+  <text x="660" y="2114" class="value" text-anchor="start">9.96x (20.69 ms)</text>
   <text x="166" y="2136" class="method-heading" text-anchor="end">batch 1,000</text>
-  <rect x="176" y="2126" width="507" height="12" rx="2" fill="#7c3aed"/>
-  <text x="691" y="2136" class="value" text-anchor="start">10.62x (18.64 ms)</text>
+  <rect x="176" y="2126" width="508" height="12" rx="2" fill="#7c3aed"/>
+  <text x="692" y="2136" class="value" text-anchor="start">10.64x (19.38 ms)</text>
   <text x="166" y="2158" class="method-heading" text-anchor="end">batch 5,000</text>
-  <rect x="176" y="2148" width="530" height="12" rx="2" fill="#7c3aed"/>
-  <text x="714" y="2158" class="value" text-anchor="start">11.09x (17.85 ms)</text>
+  <rect x="176" y="2148" width="508" height="12" rx="2" fill="#7c3aed"/>
+  <text x="692" y="2158" class="value" text-anchor="start">10.64x (19.37 ms)</text>
   <text x="24" y="2193" class="row-count">10,000 rows</text>
   <line x1="104" y1="2188" x2="1036" y2="2188" class="subsection-rule"/>
   <text x="166" y="2227" class="method-heading" text-anchor="end">SaveChanges</text>
   <rect x="176" y="2202" width="48" height="12" rx="2" fill="#2374ab"/>
-  <text x="232" y="2212" class="value" text-anchor="start">1.00x (142.30 ms)</text>
+  <text x="232" y="2212" class="value" text-anchor="start">1.00x (146.95 ms)</text>
   <rect x="176" y="2217" width="48" height="12" rx="2" fill="#2f855a"/>
-  <text x="232" y="2227" class="value" text-anchor="start">1.00x (247.34 ms)</text>
+  <text x="232" y="2227" class="value" text-anchor="start">1.00x (253.94 ms)</text>
   <rect x="176" y="2232" width="48" height="12" rx="2" fill="#7c3aed"/>
-  <text x="232" y="2242" class="value" text-anchor="start">1.00x (2,012.80 ms)</text>
+  <text x="232" y="2242" class="value" text-anchor="start">1.00x (2,029.18 ms)</text>
   <text x="166" y="2279" class="method-heading" text-anchor="end">batch 100</text>
-  <rect x="176" y="2254" width="127" height="12" rx="2" fill="#2374ab"/>
-  <text x="311" y="2264" class="value" text-anchor="start">2.65x (53.76 ms)</text>
-  <rect x="176" y="2269" width="93" height="12" rx="2" fill="#2f855a"/>
-  <text x="277" y="2279" class="value" text-anchor="start">1.95x (126.95 ms)</text>
-  <rect x="176" y="2284" width="468" height="12" rx="2" fill="#7c3aed"/>
-  <text x="652" y="2294" class="value" text-anchor="start">9.79x (205.67 ms)</text>
+  <rect x="176" y="2254" width="109" height="12" rx="2" fill="#2374ab"/>
+  <text x="293" y="2264" class="value" text-anchor="start">2.29x (64.04 ms)</text>
+  <rect x="176" y="2269" width="94" height="12" rx="2" fill="#2f855a"/>
+  <text x="278" y="2279" class="value" text-anchor="start">1.97x (129.02 ms)</text>
+  <rect x="176" y="2284" width="455" height="12" rx="2" fill="#7c3aed"/>
+  <text x="639" y="2294" class="value" text-anchor="start">9.53x (213.00 ms)</text>
   <text x="166" y="2331" class="method-heading" text-anchor="end">batch 250</text>
-  <rect x="176" y="2306" width="74" height="12" rx="2" fill="#2374ab"/>
-  <text x="258" y="2316" class="value" text-anchor="start">1.55x (91.58 ms)</text>
-  <rect x="176" y="2321" width="95" height="12" rx="2" fill="#2f855a"/>
-  <text x="279" y="2331" class="value" text-anchor="start">1.98x (124.73 ms)</text>
-  <rect x="176" y="2336" width="527" height="12" rx="2" fill="#7c3aed"/>
-  <text x="711" y="2346" class="value" text-anchor="start">11.03x (182.52 ms)</text>
+  <rect x="176" y="2306" width="85" height="12" rx="2" fill="#2374ab"/>
+  <text x="269" y="2316" class="value" text-anchor="start">1.77x (83.14 ms)</text>
+  <rect x="176" y="2321" width="100" height="12" rx="2" fill="#2f855a"/>
+  <text x="284" y="2331" class="value" text-anchor="start">2.09x (121.65 ms)</text>
+  <rect x="176" y="2336" width="513" height="12" rx="2" fill="#7c3aed"/>
+  <text x="697" y="2346" class="value" text-anchor="start">10.74x (188.94 ms)</text>
   <text x="166" y="2368" class="method-heading" text-anchor="end">batch 1,000</text>
-  <rect x="176" y="2358" width="675" height="12" rx="2" fill="#7c3aed"/>
-  <text x="859" y="2368" class="value" text-anchor="start">14.12x (142.58 ms)</text>
+  <rect x="176" y="2358" width="634" height="12" rx="2" fill="#7c3aed"/>
+  <text x="818" y="2368" class="value" text-anchor="start">13.27x (152.95 ms)</text>
   <text x="166" y="2390" class="method-heading" text-anchor="end">batch 5,000</text>
-  <rect x="176" y="2380" width="769" height="12" rx="2" fill="#7c3aed"/>
-  <text x="937" y="2390" class="value-inside" text-anchor="end">16.09x (125.13 ms)</text>
+  <rect x="176" y="2380" width="733" height="12" rx="2" fill="#7c3aed"/>
+  <text x="917" y="2390" class="value" text-anchor="start">15.35x (132.20 ms)</text>
 </svg>
 

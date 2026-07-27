@@ -180,53 +180,53 @@ Timing are medidan of 3 runs
 
 | Rows | Method | Batch Size | SQLite ms | SQLite speedup | PostgreSQL ms | PostgreSQL speedup | CockroachDB ms | CockroachDB speedup |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | SaveChanges |  | 0.15 | 1x | 1.40 | 1x | 4.53 | 1x |
-| 1 | BulkSaveChanges | 100 | 0.18 | 0.83x | 2.13 | 0.66x | 5.53 | 0.82x |
-| 100 | SaveChanges |  | 1.93 | 1x | 4.28 | 1x | 23.30 | 1x |
-| 100 | BulkSaveChanges | 100 | 0.81 | 2.38x | 2.29 | 1.87x | 6.32 | 3.69x |
-| 1,000 | SaveChanges |  | 19.50 | 1x | 24.79 | 1x | 164.09 | 1x |
-| 1,000 | BulkSaveChanges | 100 | 6.45 | 3.02x | 11.12 | 2.23x | 24.66 | 6.65x |
-| 1,000 | BulkSaveChanges | 1,000 | 21.46 | 0.91x | 9.04 | 2.74x | 15.20 | 10.80x |
-| 10,000 | SaveChanges |  | 228.19 | 1x | 289.32 | 1x | 1,664.64 | 1x |
-| 10,000 | BulkSaveChanges | 100 | 85.89 | 2.66x | 119.88 | 2.41x | 184.08 | 9.04x |
-| 10,000 | BulkSaveChanges | 1,000 | 210.25 | 1.09x | 72.82 | 3.97x | 129.55 | 12.85x |
-| 10,000 | BulkSaveChanges | 10,000 | 1,711.39 | 0.13x | 61.77 | 4.68x | 109.55 | 15.20x |
+| 1 | SaveChanges |  | 0.15 | 1x | 1.54 | 1x | 5.21 | 1x |
+| 1 | BulkSaveChanges | 100 | 0.17 | 0.85x | 2.38 | 0.65x | 5.52 | 0.94x |
+| 100 | SaveChanges |  | 1.81 | 1x | 4.47 | 1x | 29.50 | 1x |
+| 100 | BulkSaveChanges | 100 | 0.75 | 2.41x | 2.52 | 1.78x | 5.86 | 5.03x |
+| 1,000 | SaveChanges |  | 19.37 | 1x | 25.57 | 1x | 163.91 | 1x |
+| 1,000 | BulkSaveChanges | 100 | 6.52 | 2.97x | 11.03 | 2.32x | 23.39 | 7.01x |
+| 1,000 | BulkSaveChanges | 1,000 | 20.64 | 0.94x | 10.97 | 2.33x | 16.56 | 9.90x |
+| 10,000 | SaveChanges |  | 199.88 | 1x | 287.07 | 1x | 1,681.52 | 1x |
+| 10,000 | BulkSaveChanges | 100 | 144.46 | 1.38x | 107.85 | 2.66x | 211.08 | 7.97x |
+| 10,000 | BulkSaveChanges | 1,000 | 217.28 | 0.92x | 74.39 | 3.86x | 148.72 | 11.31x |
+| 10,000 | BulkSaveChanges | 10,000 | 1,739.02 | 0.11x | 63.35 | 4.53x | 125.60 | 13.39x |
 
 ### Update
 
 | Rows | Method | Batch Size | SQLite ms | SQLite speedup | PostgreSQL ms | PostgreSQL speedup | CockroachDB ms | CockroachDB speedup |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | SaveChanges |  | 1.06 | 1x | 2.43 | 1x | 2.43 | 1x |
-| 1 | BulkSaveChanges | 100 | 0.27 | 3.92x | 1.68 | 1.45x | 3.14 | 0.77x |
-| 100 | SaveChanges |  | 1.09 | 1x | 3.53 | 1x | 32.96 | 1x |
-| 100 | BulkSaveChanges | 100 | 0.92 | 1.19x | 10.13 | 0.35x | 4.77 | 6.91x |
-| 1,000 | SaveChanges |  | 12.46 | 1x | 27.10 | 1x | 290.11 | 1x |
-| 1,000 | BulkSaveChanges | 100 | 7.50 | 1.66x | 12.32 | 2.20x | 27.13 | 10.69x |
-| 1,000 | BulkSaveChanges | 250 | 12.04 | 1.03x | 12.39 | 2.19x | 28.99 | 10.01x |
-| 1,000 | BulkSaveChanges | 1,000 |  |  |  |  | 20.88 | 13.89x |
-| 1,000 | BulkSaveChanges | 5,000 |  |  |  |  | 18.88 | 15.37x |
-| 10,000 | SaveChanges |  | 155.58 | 1x | 281.13 | 1x | 2,870.38 | 1x |
-| 10,000 | BulkSaveChanges | 100 | 79.77 | 1.95x | 174.28 | 1.61x | 279.21 | 10.28x |
-| 10,000 | BulkSaveChanges | 250 | 156.62 | 0.99x | 114.87 | 2.45x | 263.32 | 10.90x |
-| 10,000 | BulkSaveChanges | 1,000 |  |  |  |  | 199.08 | 14.42x |
-| 10,000 | BulkSaveChanges | 5,000 |  |  |  |  | 165.74 | 17.32x |
+| 1 | SaveChanges |  | 0.93 | 1x | 1.18 | 1x | 4.65 | 1x |
+| 1 | BulkSaveChanges | 100 | 0.16 | 5.76x | 1.38 | 0.85x | 2.78 | 1.67x |
+| 100 | SaveChanges |  | 1.44 | 1x | 3.72 | 1x | 31.04 | 1x |
+| 100 | BulkSaveChanges | 100 | 0.98 | 1.47x | 8.42 | 0.44x | 4.40 | 7.06x |
+| 1,000 | SaveChanges |  | 12.52 | 1x | 26.92 | 1x | 282.71 | 1x |
+| 1,000 | BulkSaveChanges | 100 | 7.48 | 1.67x | 12.86 | 2.09x | 28.47 | 9.93x |
+| 1,000 | BulkSaveChanges | 250 | 11.95 | 1.05x | 9.76 | 2.76x | 25.76 | 10.98x |
+| 1,000 | BulkSaveChanges | 1,000 |  |  |  |  | 18.25 | 15.49x |
+| 1,000 | BulkSaveChanges | 5,000 |  |  |  |  | 18.39 | 15.38x |
+| 10,000 | SaveChanges |  | 179.13 | 1x | 302.04 | 1x | 2,860.20 | 1x |
+| 10,000 | BulkSaveChanges | 100 | 106.41 | 1.68x | 183.07 | 1.65x | 274.18 | 10.43x |
+| 10,000 | BulkSaveChanges | 250 | 146.04 | 1.23x | 121.89 | 2.48x | 250.67 | 11.41x |
+| 10,000 | BulkSaveChanges | 1,000 |  |  |  |  | 208.55 | 13.71x |
+| 10,000 | BulkSaveChanges | 5,000 |  |  |  |  | 178.70 | 16.01x |
 
 ### Mixed Add/Update/Delete
 
 | Rows | Method | Batch Size | SQLite ms | SQLite speedup | PostgreSQL ms | PostgreSQL speedup | CockroachDB ms | CockroachDB speedup |
 | ---: | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | SaveChanges |  | 0.10 | 1x | 0.97 | 1x | 2.07 | 1x |
-| 1 | BulkSaveChanges | 100 | 0.12 | 0.86x | 1.19 | 0.81x | 2.72 | 0.76x |
-| 100 | SaveChanges |  | 1.55 | 1x | 3.64 | 1x | 23.87 | 1x |
-| 100 | BulkSaveChanges | 100 | 0.46 | 3.39x | 2.66 | 1.37x | 5.83 | 4.09x |
-| 1,000 | SaveChanges |  | 9.74 | 1x | 24.77 | 1x | 198.29 | 1x |
-| 1,000 | BulkSaveChanges | 100 | 4.74 | 2.05x | 10.94 | 2.26x | 25.18 | 7.88x |
-| 1,000 | BulkSaveChanges | 250 | 11.84 | 0.82x | 8.39 | 2.95x | 18.99 | 10.44x |
-| 1,000 | BulkSaveChanges | 1,000 |  |  |  |  | 18.64 | 10.64x |
-| 1,000 | BulkSaveChanges | 5,000 |  |  |  |  | 17.87 | 11.10x |
-| 10,000 | SaveChanges |  | 144.87 | 1x | 247.34 | 1x | 1,996.79 | 1x |
-| 10,000 | BulkSaveChanges | 100 | 55.18 | 2.63x | 126.95 | 1.95x | 193.84 | 10.30x |
-| 10,000 | BulkSaveChanges | 250 | 74.83 | 1.94x | 124.73 | 1.98x | 172.90 | 11.55x |
-| 10,000 | BulkSaveChanges | 1,000 |  |  |  |  | 139.98 | 14.27x |
-| 10,000 | BulkSaveChanges | 5,000 |  |  |  |  | 130.34 | 15.32x |
+| 1 | SaveChanges |  | 0.07 | 1x | 1.01 | 1x | 2.01 | 1x |
+| 1 | BulkSaveChanges | 100 | 0.11 | 0.61x | 1.63 | 0.62x | 2.53 | 0.79x |
+| 100 | SaveChanges |  | 1.40 | 1x | 3.93 | 1x | 24.35 | 1x |
+| 100 | BulkSaveChanges | 100 | 0.55 | 2.53x | 3.02 | 1.30x | 5.97 | 4.08x |
+| 1,000 | SaveChanges |  | 9.85 | 1x | 27.58 | 1x | 206.13 | 1x |
+| 1,000 | BulkSaveChanges | 100 | 4.80 | 2.05x | 11.15 | 2.47x | 23.58 | 8.74x |
+| 1,000 | BulkSaveChanges | 250 | 6.70 | 1.47x | 15.45 | 1.79x | 20.69 | 9.96x |
+| 1,000 | BulkSaveChanges | 1,000 |  |  |  |  | 19.38 | 10.64x |
+| 1,000 | BulkSaveChanges | 5,000 |  |  |  |  | 19.37 | 10.64x |
+| 10,000 | SaveChanges |  | 146.95 | 1x | 253.94 | 1x | 2,029.18 | 1x |
+| 10,000 | BulkSaveChanges | 100 | 64.04 | 2.29x | 129.02 | 1.97x | 213.00 | 9.53x |
+| 10,000 | BulkSaveChanges | 250 | 83.14 | 1.77x | 121.65 | 2.09x | 188.94 | 10.74x |
+| 10,000 | BulkSaveChanges | 1,000 |  |  |  |  | 152.95 | 13.27x |
+| 10,000 | BulkSaveChanges | 5,000 |  |  |  |  | 132.20 | 15.35x |
 

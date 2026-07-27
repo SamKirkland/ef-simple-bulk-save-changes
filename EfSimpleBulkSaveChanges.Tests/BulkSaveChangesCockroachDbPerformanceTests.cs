@@ -504,7 +504,7 @@ public sealed class BulkSaveChangesCockroachDbPerformanceTests
             await using var command = connection.CreateCommand();
             command.CommandText = """
             CREATE TABLE performance_users (
-                id INT PRIMARY KEY DEFAULT unique_rowid(),
+                id INT PRIMARY KEY DEFAULT unordered_unique_rowid(),
                 first_name TEXT NOT NULL,
                 last_name TEXT NOT NULL,
                 email TEXT NULL
