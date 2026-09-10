@@ -224,7 +224,7 @@ public sealed class BulkSaveChangesCockroachDbSingleNodeInsertDiagnosticsTests
                 containerName,
                 "-p",
                 $"127.0.0.1:{port}:26257",
-                "cockroachdb/cockroach:v26.2.1",
+                "cockroachdb/cockroach:v26.3.1",
                 "start-single-node",
                 "--insecure");
 
